@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="マーパンと色のついたドレミパイプを鳴らし、音を比べるLifeSketchの実験作品。">
+  <meta name="theme-color" content="#f5f4ef">
+  <title>マーパンとドレミパイプ | LifeSketch 001</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="page">
+    <nav><a href="../">← LifeSketch</a></nav>
+    <header><span class="eyebrow">LIFE SKETCH 001 · SOUND EXPERIMENT</span><h1>マーパンと<br>ドレミパイプ</h1><p>並んだパイプを鳴らして、音の高さを比べよう。</p></header>
+    <section class="stage" aria-label="マーパンとドレミパイプの演奏画面">
+      <div id="canvas-holder"></div>
+      <p id="sound-status" role="status">パイプを選ぶと音が始まります</p>
+    </section>
+    <section class="controls" aria-label="音を鳴らす"><h2>音を選ぶ</h2><div id="note-buttons" class="note-buttons"></div><p>パイプか音名をタップ。キーボードの 1〜8 でも鳴らせます。</p></section>
+    <section class="note"><h2>きょうの実験</h2><p>同じように叩いても、長さの違うパイプからは違う高さの音が生まれます。左から順に鳴らす、飛ばして鳴らす、好きな短い旋律をつくる。目と耳で確かめてみてください。</p></section>
+  </main>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/addons/p5.sound.min.js"></script>
+  <script src="../shared/marpan-25d.js"></script>
+  <script src="sketch.js"></script>
+</body>
+</html>
