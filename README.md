@@ -17,9 +17,9 @@
 
 ## マージ前にPC・スマートフォンで遊ぶ
 
-PRプレビューは別サイトの [MovingSketch Preview](https://sawanoto.github.io/MovingSketch-preview/) に配信されます。PR番号が `N` のとき、URLは `https://sawanoto.github.io/MovingSketch-preview/pr-N/` です。
+PRプレビューは別サイトの [LifeSketch Preview](https://sawanoto.github.io/LifeSketch-preview/) に配信されます。PR番号が `N` のとき、URLは `https://sawanoto.github.io/LifeSketch-preview/pr-N/` です。
 
-PR #1の作品: https://sawanoto.github.io/MovingSketch-preview/pr-1/001_doremi-pipes/
+PR #1の作品: https://sawanoto.github.io/LifeSketch-preview/pr-1/001_doremi-pipes/
 
 同じURLをスマートフォンでも開き、パイプや音名をタップして音と操作を確認してください。PCでは数字キー1〜8でも鳴らせます。最初の操作で音声が始まります。
 
@@ -30,3 +30,4 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 ## 共通マーパン部品
 
 `shared/marpan-25d.js` は MovingSketch のコミット `eb44b094b434f4b9eb6ad0ebcbf52dfe9ca64187` から引き継いでいます。LifeSketch内の作品はこの共通ファイルを参照します。以後の変更はこのリポジトリ内で管理します。
+
