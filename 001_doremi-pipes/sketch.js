@@ -11,12 +11,57 @@ const NOTES = [
 const MIN_LENGTH = .5, MAX_LENGTH = 1.5, STRIKE_MS = 440, IMPACT = .43;
 const lengths = NOTES.map(() => 1);
 const strikes = NOTES.map(() => null);
-const voices = [], envelopes = [], sliders = [], readouts = [], buttons = [];
-let marpan, audioReady = false, activeNote = -1, drag = null;
+const PIANO_NOTES = [['Fs3',185], ['A3',220], ['C4',261.63], ['Ds4',311.13], ['Fs4',369.99], ['A4',440], ['C5',523.25], ['Ds5',622.25], ['Fs5',739.99], ['A5',880], ['C6',1046.5]];
+const voices = new Set(), sliders = [], readouts = [], buttons = [];
+let pianoLoad = null, pianoSamples = [], pianoOutput = null, soundEpoch = 0;
+let marpan, activeNote = -1, drag = null;
 
 if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embedded');
 
 function frequencyFor(index) { return NOTES[index].frequency / lengths[index]; }
+
+function loadPiano() {
+  if (pianoLoad) return pianoLoad;
+  pianoLoad = Promise.all(PIANO_NOTES.map(async ([name, frequency]) => {
+    const response = await fetch(`../assets/piano/${name}.mp3`);
+    if (!response.ok) throw new Error(`Piano sample unavailable: ${name}`);
+    const buffer = await getAudioContext().decodeAudioData(await response.arrayBuffer());
+    return {frequency, buffer};
+  })).then(samples => { pianoSamples = samples; }).catch(error => { pianoLoad = null; throw error; });
+  return pianoLoad;
+}
+
+function stopVoice(voice) {
+  const now = getAudioContext().currentTime;
+  voice.gain.gain.cancelScheduledValues(now);
+  voice.gain.gain.setTargetAtTime(0, now, .008);
+  voice.source.stop(now + .04);
+  voices.delete(voice);
+}
+
+function playPiano(frequency) {
+  const context = getAudioContext(), now = context.currentTime;
+  if (!pianoOutput) {
+    pianoOutput = context.createDynamicsCompressor();
+    pianoOutput.threshold.value = -16;
+    pianoOutput.ratio.value = 4;
+    pianoOutput.connect(context.destination);
+  }
+  if (voices.size >= 16) stopVoice(voices.values().next().value);
+  const sample = pianoSamples.reduce((best, candidate) =>
+    Math.abs(Math.log2(frequency / candidate.frequency)) < Math.abs(Math.log2(frequency / best.frequency)) ? candidate : best);
+  const source = context.createBufferSource(), gain = context.createGain();
+  source.buffer = sample.buffer;
+  source.playbackRate.value = frequency / sample.frequency;
+  const duration = Math.min(sample.buffer.duration / source.playbackRate.value, 3.4);
+  gain.gain.setValueAtTime(.75, now);
+  gain.gain.setValueAtTime(.75, now + Math.max(0, duration - .3));
+  gain.gain.linearRampToValueAtTime(0, now + duration);
+  source.connect(gain); gain.connect(pianoOutput);
+  const voice = {source, gain}; voices.add(voice);
+  source.onended = () => { voices.delete(voice); source.disconnect(); gain.disconnect(); };
+  source.start(now); source.stop(now + duration);
+}
 
 function setup() {
   const holder = document.querySelector('#canvas-holder');
@@ -56,7 +101,8 @@ function setup() {
   });
   document.querySelector('#reset-lengths').addEventListener('click', () => {
     NOTES.forEach((_, i) => { setLength(i, 1); strikes[i] = null; buttons[i].classList.remove('is-playing'); });
-    voices.forEach(voice => voice.amp(0, .02));
+    soundEpoch++;
+    voices.forEach(stopVoice);
     activeNote = -1;
     document.querySelector('#sound-status').textContent = 'すべてのパイプを元の長さに戻しました';
   });
@@ -68,6 +114,12 @@ function setup() {
   document.addEventListener('keydown', event => {
     if (event.target.matches('input,textarea,select') || event.repeat) return;
     if (/^[1-8]$/.test(event.key)) { event.preventDefault(); strike(Number(event.key) - 1); }
+  });
+  document.querySelector('#sound-status').textContent = 'ピアノの音を準備しています…';
+  loadPiano().then(() => {
+    document.querySelector('#sound-status').textContent = 'パイプをタップして、ピアノの音で試してみよう';
+  }).catch(() => {
+    document.querySelector('#sound-status').textContent = 'ピアノ音源を読み込めませんでした。タップして再試行できます。';
   });
 }
 
@@ -96,18 +148,11 @@ function geometry(i) {
 }
 
 async function strike(i) {
+  const epoch = soundEpoch;
   try {
     await userStartAudio();
-    if (!audioReady) {
-      NOTES.forEach(() => {
-        const oscillator = new p5.Oscillator('triangle');
-        oscillator.amp(0); oscillator.start(); voices.push(oscillator);
-        const envelope = new p5.Envelope();
-        envelope.setADSR(.003, .23, 0, .04);
-        envelope.setRange(.16, 0); envelopes.push(envelope);
-      });
-      audioReady = true;
-    }
+    await loadPiano();
+    if (epoch !== soundEpoch) return;
     strikes[i] = {started:millis(), sounded:false, frequency:frequencyFor(i)};
     activeNote = i;
     buttons[i].classList.add('is-playing');
@@ -131,8 +176,7 @@ function draw() {
       else gap = g.restGap * Math.sin((t - IMPACT) / (1 - IMPACT) * HALF_PI);
       if (t >= IMPACT && !hit.sounded) {
         hit.sounded = true;
-        voices[i].freq(hit.frequency);
-        envelopes[i].play(voices[i]);
+        playPiano(hit.frequency);
         document.querySelector('#sound-status').textContent = `${NOTES[i].label}のパイプ · 長さ ${Math.round(lengths[i] * 100)}% · ${Math.round(hit.frequency)} Hz`;
       }
     }
