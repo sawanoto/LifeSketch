@@ -23,6 +23,8 @@ PR #1の作品: https://sawanoto.github.io/LifeSketch-preview/pr-1/001_doremi-pi
 
 同じURLをスマートフォンでも開き、パイプや音名をタップして音と操作を確認してください。PCでは数字キー1〜8でも鳴らせます。最初の操作で音声が始まります。
 
+ドレミパイプは、筒の上端をドラッグするか各スライダーを動かすと長さを50〜150%で調整できます。長さと反比例して周波数が変わり、手を離すと試聴できます。「元の長さに戻す」で8本の長さと音を初期状態へ戻します。演奏では筒が地面に接した瞬間に音が鳴ります。
+
 PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で変更を検出して配信します。混雑時は遅延することがあります。急ぐ場合は [Refresh PR previews](https://github.com/sawanoto/LifeSketch-preview/actions/workflows/previews.yml) の「Run workflow」で更新できます。一覧ページのコミット表示か、各PR直下の `preview-info.json` で反映済みのコミットを確認できます。PRを閉じると次の更新でプレビューが削除されます。
 
 管理方法と方式の比較: https://github.com/sawanoto/LifeSketch-preview

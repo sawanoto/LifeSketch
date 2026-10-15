@@ -11,13 +11,14 @@
 <body>
   <main class="page">
     <nav><a href="../">← LifeSketch</a></nav>
-    <header><span class="eyebrow">LIFE SKETCH 001 · SOUND EXPERIMENT</span><h1>マーパンと<br>ドレミパイプ</h1><p>並んだパイプを鳴らして、音の高さを比べよう。</p></header>
+    <header><span class="eyebrow">LIFE SKETCH 001 · SOUND EXPERIMENT</span><h1>マーパンと<br>ドレミパイプ</h1><p>長くすると、低い音。短くすると、高い音。</p></header>
     <section class="stage" aria-label="マーパンとドレミパイプの演奏画面">
       <div id="canvas-holder"></div>
       <p id="sound-status" role="status">パイプを選ぶと音が始まります</p>
     </section>
-    <section class="controls" aria-label="音を鳴らす"><h2>音を選ぶ</h2><div id="note-buttons" class="note-buttons"></div><p>パイプか音名をタップ。キーボードの 1〜8 でも鳴らせます。</p></section>
-    <section class="note"><h2>きょうの実験</h2><p>同じように叩いても、長さの違うパイプからは違う高さの音が生まれます。左から順に鳴らす、飛ばして鳴らす、好きな短い旋律をつくる。目と耳で確かめてみてください。</p></section>
+    <section class="controls" aria-label="音を鳴らす"><h2>地面にトン、と鳴らす</h2><div id="note-buttons" class="note-buttons"></div><p>筒の胴をタップして演奏。筒の上のつまみを上下に動かすと長さを変えられます。PCは数字キー1〜8でも演奏できます。</p></section>
+    <section class="length-controls" aria-labelledby="length-title"><div class="length-heading"><div><h2 id="length-title">パイプの長さを変える</h2><p>スライダーでも調整できます。手を離すと、その長さの音が鳴ります。</p></div><button id="reset-lengths" type="button">元の長さに戻す</button></div><div id="length-sliders" class="length-sliders"></div></section>
+    <section class="note"><h2>きょうの実験</h2><p>同じ色のパイプを長くしたり短くしたりして、音を比べてみましょう。長さを2倍にすると、音の周波数は半分になります。短いパイプと長いパイプを交互に鳴らして、目と耳で確かめてみてください。</p></section>
   </main>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/addons/p5.sound.min.js"></script>

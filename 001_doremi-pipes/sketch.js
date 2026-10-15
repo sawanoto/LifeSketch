@@ -1,131 +1,207 @@
 const NOTES = [
-  { label: "ド", frequency: 261.63, color: "#f17d77" },
-  { label: "レ", frequency: 293.66, color: "#f3a65e" },
-  { label: "ミ", frequency: 329.63, color: "#f1d36d" },
-  { label: "ファ", frequency: 349.23, color: "#8bcf8c" },
-  { label: "ソ", frequency: 392.00, color: "#78c7dc" },
-  { label: "ラ", frequency: 440.00, color: "#8da8e6" },
-  { label: "シ", frequency: 493.88, color: "#bd9bde" },
-  { label: "高いド", frequency: 523.25, color: "#ee9ec3" }
+  {label:'ド', frequency:261.63, color:'#f17d77'},
+  {label:'レ', frequency:293.66, color:'#f3a65e'},
+  {label:'ミ', frequency:329.63, color:'#f1d36d'},
+  {label:'ファ', frequency:349.23, color:'#8bcf8c'},
+  {label:'ソ', frequency:392, color:'#78c7dc'},
+  {label:'ラ', frequency:440, color:'#8da8e6'},
+  {label:'シ', frequency:493.88, color:'#bd9bde'},
+  {label:'高いド', frequency:523.25, color:'#ee9ec3'}
 ];
+const MIN_LENGTH = .5, MAX_LENGTH = 1.5, STRIKE_MS = 440, IMPACT = .43;
+const lengths = NOTES.map(() => 1);
+const strikes = NOTES.map(() => null);
+const voices = [], envelopes = [], sliders = [], readouts = [], buttons = [];
+let marpan, audioReady = false, activeNote = -1, drag = null;
 
-if (new URLSearchParams(window.location.search).has("embed")) {
-  document.documentElement.classList.add("embedded");
-}
+if (new URLSearchParams(location.search).has('embed')) document.documentElement.classList.add('embedded');
 
-let marpan;
-let voice;
-let audioReady = false;
-let activeNote = -1;
-let activeUntil = 0;
-let lastPointerAt = 0;
+function frequencyFor(index) { return NOTES[index].frequency / lengths[index]; }
 
 function setup() {
-  const holder = document.querySelector("#canvas-holder");
-  createCanvas(holder.clientWidth, holder.clientHeight).parent(holder);
-  pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-  marpan = new Marpan25D({ bodyColor: "#fff8ee", autoBlink: true, maxSize: 180 });
-  const buttons = document.querySelector("#note-buttons");
-  NOTES.forEach((note, index) => {
-    const button = document.createElement("button");
-    button.type = "button";
+  const holder = document.querySelector('#canvas-holder');
+  const canvas = createCanvas(holder.clientWidth, holder.clientHeight);
+  canvas.parent(holder);
+  canvas.elt.style.touchAction = 'none';
+  canvas.elt.setAttribute('aria-label', 'パイプの胴をタップして演奏。上端のつまみを上下にドラッグして長さを変更');
+  pixelDensity(Math.min(devicePixelRatio || 1, 2));
+  marpan = new Marpan25D({bodyColor:'#fff8ee', autoBlink:true});
+  NOTES.forEach((note, i) => {
+    const button = document.createElement('button');
+    button.type = 'button';
     button.textContent = note.label;
-    button.setAttribute("aria-label", `${note.label}の音を鳴らす`);
-    button.style.setProperty("--note-color", note.color);
-    button.addEventListener("click", () => playNote(index));
-    buttons.append(button);
+    button.setAttribute('aria-label', `${note.label}のパイプを叩く`);
+    button.style.setProperty('--note-color', note.color);
+    button.addEventListener('click', () => strike(i));
+    document.querySelector('#note-buttons').append(button);
+    buttons.push(button);
+    const card = document.createElement('div');
+    card.className = 'length-card';
+    card.style.setProperty('--note-color', note.color);
+    const label = document.createElement('label');
+    label.htmlFor = `length-${i}`;
+    label.textContent = `${note.label}の長さ`;
+    const slider = document.createElement('input');
+    slider.id = label.htmlFor;
+    slider.type = 'range';
+    slider.min = 50; slider.max = 150; slider.step = 1; slider.value = 100;
+    slider.addEventListener('input', () => setLength(i, Number(slider.value) / 100));
+    slider.addEventListener('change', () => strike(i));
+    const output = document.createElement('output');
+    output.htmlFor = slider.id;
+    card.append(label, slider, output);
+    document.querySelector('#length-sliders').append(card);
+    sliders.push(slider); readouts.push(output);
+    setLength(i, 1);
   });
+  document.querySelector('#reset-lengths').addEventListener('click', () => {
+    NOTES.forEach((_, i) => { setLength(i, 1); strikes[i] = null; buttons[i].classList.remove('is-playing'); });
+    voices.forEach(voice => voice.amp(0, .02));
+    activeNote = -1;
+    document.querySelector('#sound-status').textContent = 'すべてのパイプを元の長さに戻しました';
+  });
+  canvas.elt.addEventListener('pointerdown', onPointerDown);
+  canvas.elt.addEventListener('pointermove', onPointerMove);
+  canvas.elt.addEventListener('pointerup', finishDrag);
+  canvas.elt.addEventListener('pointercancel', event => { if (drag?.pointerId === event.pointerId) drag = null; });
+  canvas.elt.addEventListener('lostpointercapture', event => { if (drag?.pointerId === event.pointerId) drag = null; });
+  document.addEventListener('keydown', event => {
+    if (event.target.matches('input,textarea,select') || event.repeat) return;
+    if (/^[1-8]$/.test(event.key)) { event.preventDefault(); strike(Number(event.key) - 1); }
+  });
+}
+
+function setLength(i, ratio) {
+  lengths[i] = Math.max(MIN_LENGTH, Math.min(MAX_LENGTH, Math.round(ratio * 100) / 100));
+  sliders[i].value = Math.round(lengths[i] * 100);
+  readouts[i].textContent = `${Math.round(lengths[i] * 100)}% · ${Math.round(frequencyFor(i))} Hz`;
+  sliders[i].setAttribute('aria-valuetext', readouts[i].textContent);
 }
 
 function windowResized() {
-  const holder = document.querySelector("#canvas-holder");
+  const holder = document.querySelector('#canvas-holder');
   resizeCanvas(holder.clientWidth, holder.clientHeight);
 }
 
+function geometry(i) {
+  const margin = width < 520 ? 13 : 34;
+  const cell = (width - margin * 2) / 8;
+  const diameter = Math.min(cell * .68, 55);
+  const ground = height * .85;
+  const restGap = height * .08;
+  const unitHeight = height * .46;
+  const tubeHeight = unitHeight * (NOTES[0].frequency / NOTES[i].frequency) * lengths[i];
+  const bottom = ground - restGap;
+  return {x:margin + cell * (i + .5), diameter, ground, restGap, unitHeight, tubeHeight, bottom, top:bottom - tubeHeight};
+}
+
+async function strike(i) {
+  try {
+    await userStartAudio();
+    if (!audioReady) {
+      NOTES.forEach(() => {
+        const oscillator = new p5.Oscillator('triangle');
+        oscillator.amp(0); oscillator.start(); voices.push(oscillator);
+        const envelope = new p5.Envelope();
+        envelope.setADSR(.003, .23, 0, .04);
+        envelope.setRange(.16, 0); envelopes.push(envelope);
+      });
+      audioReady = true;
+    }
+    strikes[i] = {started:millis(), sounded:false, frequency:frequencyFor(i)};
+    activeNote = i;
+    buttons[i].classList.add('is-playing');
+  } catch (error) {
+    document.querySelector('#sound-status').textContent = '音を開始できませんでした。もう一度パイプをタップしてください。';
+  }
+}
+
 function draw() {
-  background("#faf9f5");
-  const margin = width < 520 ? 16 : 36;
-  const gap = width < 520 ? 5 : 10;
-  const tubeWidth = (width - 2 * margin - gap * 7) / 8;
-  const baseline = height * .78;
-  const longest = height * .47;
-  const shortest = height * .23;
-  noStroke();
-  fill("#e9e7df");
-  rect(0, baseline + 16, width, height - baseline);
+  background('#faf9f5');
+  const ground = height * .85;
+  noStroke(); fill('#e6dfd2'); rect(0, ground, width, height - ground);
+  stroke('#d0c6b5'); strokeWeight(1); line(0, ground, width, ground); noStroke();
   for (let i = 0; i < NOTES.length; i++) {
-    const x = margin + i * (tubeWidth + gap);
-    const tubeHeight = longest + (shortest - longest) * i / 7;
-    const bounce = activeNote === i && millis() < activeUntil ? 12 * sin((activeUntil - millis()) * .035) : 0;
-    const y = baseline - tubeHeight - bounce;
-    fill("#00000018");
-    rect(x + 3, baseline + 4, tubeWidth, 11, 7);
-    fill(NOTES[i].color);
-    rect(x, y, tubeWidth, tubeHeight, Math.min(14, tubeWidth * .3));
-    fill("#ffffff90");
-    rect(x + tubeWidth * .14, y + 8, Math.max(3, tubeWidth * .13), tubeHeight - 18, 4);
-    fill("#25323d");
-    textAlign(CENTER, CENTER);
-    textSize(width < 520 ? 14 : 19);
-    textStyle(BOLD);
-    text(width < 520 && i === 7 ? "高ド" : NOTES[i].label, x + tubeWidth / 2, baseline - 20 - bounce);
+    const g = geometry(i), hit = strikes[i];
+    const t = hit ? Math.min((millis() - hit.started) / STRIKE_MS, 1) : 1;
+    let gap = g.restGap;
+    if (hit && t < 1) {
+      if (t < .2) gap += height * .045 * Math.sin(t / .2 * HALF_PI);
+      else if (t < IMPACT) gap = (g.restGap + height * .045) * (1 - Math.pow((t - .2) / (IMPACT - .2), 2));
+      else gap = g.restGap * Math.sin((t - IMPACT) / (1 - IMPACT) * HALF_PI);
+      if (t >= IMPACT && !hit.sounded) {
+        hit.sounded = true;
+        voices[i].freq(hit.frequency);
+        envelopes[i].play(voices[i]);
+        document.querySelector('#sound-status').textContent = `${NOTES[i].label}のパイプ · 長さ ${Math.round(lengths[i] * 100)}% · ${Math.round(hit.frequency)} Hz`;
+      }
+    }
+    if (hit && t >= 1) { strikes[i] = null; buttons[i].classList.remove('is-playing'); }
+    const bottom = g.ground - gap;
+    fill(50, 44, 37, 22 + 55 * (1 - Math.min(gap / (height * .13), 1)));
+    ellipse(g.x + gap * .12, g.ground + 4, g.diameter * (1.1 + gap / height * 4), 9 + gap * .12);
+    if (hit && t >= IMPACT && t < .78) {
+      const ripple = (t - IMPACT) / (.78 - IMPACT);
+      noFill(); stroke(168, 130, 77, 180 * (1 - ripple)); strokeWeight(2);
+      ellipse(g.x, ground + 3, g.diameter * (1 + ripple * 2), 10 + ripple * 12); noStroke();
+    }
+    drawTube(g.x, bottom - g.tubeHeight, bottom, g.diameter, NOTES[i].color);
+    fill('#283140'); textAlign(CENTER, CENTER); textStyle(BOLD); textSize(width < 520 ? 12 : 16);
+    text(i === 7 ? '高ド' : NOTES[i].label, g.x, ground + 28);
   }
-  const targetX = activeNote < 0 ? width * .5 : margin + (activeNote + .5) * (tubeWidth + gap);
-  marpan.drawAt(width * .5, height * .21, {
-    bodyWidth: Math.min(width * .29, height * .29, 175),
-    lookX: targetX,
-    lookY: baseline - longest * .55,
-    pulse: activeNote >= 0 && millis() < activeUntil ? .6 : 0
-  });
+  const look = geometry(Math.max(activeNote, 0));
+  marpan.drawAt(width * .88, height * .12, {bodyWidth:Math.min(width * .14, 90), lookX:look.x, lookY:ground, pulse:strikes.some(Boolean) ? .6 : 0});
 }
 
-function playNote(index) {
-  if (index < 0 || index >= NOTES.length) return;
-  if (!audioReady) {
-    userStartAudio();
-    voice = new p5.Oscillator("sine");
-    voice.start();
-    voice.amp(0);
-    audioReady = true;
+function drawTube(x, top, bottom, diameter, tubeColor) {
+  const rim = diameter * .34;
+  fill(tubeColor); rect(x - diameter / 2, top, diameter, bottom - top);
+  ellipse(x, bottom, diameter, rim);
+  fill('#00000015'); rect(x + diameter * .23, top, diameter * .27, bottom - top);
+  fill('#ffffff65'); rect(x - diameter * .34, top + 3, diameter * .13, Math.max(1, bottom - top - 6), 4);
+  fill(tubeColor); ellipse(x, top, diameter, rim);
+  fill('#38332f'); ellipse(x, top, diameter * .71, rim * .64);
+  noFill(); stroke('#ffffffbc'); strokeWeight(2);
+  arc(x, top, diameter * .88, rim * .86, PI, TWO_PI); noStroke();
+  // A small outlined handle distinguishes resizing from tapping the tube body.
+  fill('#fffdf6'); stroke('#5d6668'); strokeWeight(1);
+  ellipse(x, top - 10, 18, 18); noStroke();
+  fill('#5d6668'); triangle(x - 3, top - 11, x + 3, top - 11, x, top - 15);
+  triangle(x - 3, top - 9, x + 3, top - 9, x, top - 5);
+}
+
+function pointInCanvas(event) {
+  const box = event.currentTarget.getBoundingClientRect();
+  return {x:(event.clientX - box.left) * width / box.width, y:(event.clientY - box.top) * height / box.height};
+}
+
+function onPointerDown(event) {
+  if (drag) return;
+  const p = pointInCanvas(event);
+  for (let i = 0; i < NOTES.length; i++) {
+    const g = geometry(i);
+    if (Math.abs(p.x - g.x) <= Math.max(g.diameter / 2, 17) && Math.abs(p.y - (g.top - 10)) <= 20) {
+      drag = {index:i, pointerId:event.pointerId, startY:p.y, startLength:lengths[i]};
+      strikes[i] = null; buttons[i].classList.remove('is-playing');
+      event.currentTarget.setPointerCapture(event.pointerId); event.preventDefault(); return;
+    }
+    if (Math.abs(p.x - g.x) <= Math.max(g.diameter / 2, 17) && p.y >= g.top && p.y <= g.bottom + g.diameter * .2) {
+      strike(i); event.preventDefault(); return;
+    }
   }
-  voice.amp(0, .015);
-  voice.freq(NOTES[index].frequency, .01);
-  voice.amp(.23, .025);
-  voice.amp(0, .24, .05);
-  activeNote = index;
-  activeUntil = millis() + 290;
-  document.querySelector("#sound-status").textContent = `${NOTES[index].label}を鳴らしました`;
-  const buttons = document.querySelectorAll("#note-buttons button");
-  buttons.forEach(button => button.classList.remove("is-playing"));
-  buttons[index].classList.add("is-playing");
-  window.setTimeout(() => buttons[index].classList.remove("is-playing"), 290);
 }
 
-function pointerToNote() {
-  if (mouseX < 0 || mouseX >= width || mouseY < height * .28 || mouseY > height * .83) return;
-  const margin = width < 520 ? 16 : 36;
-  const gap = width < 520 ? 5 : 10;
-  const tubeWidth = (width - 2 * margin - gap * 7) / 8;
-  const index = Math.floor((mouseX - margin) / (tubeWidth + gap));
-  if (index >= 0 && index < 8 && mouseX <= margin + index * (tubeWidth + gap) + tubeWidth) {
-    playNote(index);
-    lastPointerAt = millis();
-  }
+function onPointerMove(event) {
+  if (!drag || drag.pointerId !== event.pointerId) return;
+  const g = geometry(drag.index), p = pointInCanvas(event);
+  const baseHeight = g.unitHeight * NOTES[0].frequency / NOTES[drag.index].frequency;
+  setLength(drag.index, drag.startLength + (drag.startY - p.y) / baseHeight);
+  event.preventDefault();
 }
 
-function mousePressed(event) {
-  if (!(event.target instanceof HTMLCanvasElement)) return;
-  if (millis() - lastPointerAt > 100) pointerToNote();
-  return false;
-}
-
-function touchStarted(event) {
-  if (!(event.target instanceof HTMLCanvasElement)) return;
-  pointerToNote();
-  return false;
-}
-
-function keyPressed() {
-  const index = Number(key) - 1;
-  if (index >= 0 && index < 8) playNote(index);
+function finishDrag(event) {
+  if (!drag || drag.pointerId !== event.pointerId) return;
+  const i = drag.index; drag = null;
+  if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+  strike(i);
 }
