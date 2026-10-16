@@ -107,3 +107,81 @@ jobs:
             if (existing) await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
             else await github.rest.issues.createComment({ ...context.repo, issue_number: pr.number, body });
             await core.summary.addHeading('PR preview').addRaw(body).write();
+
+  readiness:
+    needs: link
+    if: github.event.pull_request.state == 'open' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Confirm deployed SHA and local scripts/styles
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const repo = context.repo.repo;
+            const base = `https://${context.repo.owner.toLowerCase()}.github.io/${repo}-preview/pr-${pr.number}/`;
+            const marker = '<!-- isolated-pr-preview -->';
+            const statusMarker = '<!-- preview-readiness -->';
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              ...context.repo, pull_number: pr.number, per_page: 100
+            });
+            const folders = [...new Set(files.filter(f => f.status !== 'removed')
+              .map(f => f.filename.split('/')[0])
+              .filter(f => /^\d+[_-][A-Za-z0-9_-]+$/.test(f)))];
+            const deadline = Date.now() + 360000;
+            async function get(url) {
+              if (Date.now() >= deadline) throw new Error('配信確認の待機時間が終了しました');
+              const target = new URL(url);
+              target.searchParams.set('preview_check', `${pr.head.sha}-${Date.now()}`);
+              const response = await fetch(target, { signal: AbortSignal.timeout(Math.min(8000, Math.max(1, deadline - Date.now()))), cache: 'no-store' });
+              if (!response.ok) throw new Error(`HTTP ${response.status}: ${new URL(url).pathname}`);
+              return response;
+            }
+            async function verifyDocument(url) {
+              const document = await (await get(url)).text();
+              const assets = [...document.matchAll(/<(?:script|link)\b[^>]*?\b(?:src|href)\s*=\s*["']([^"']+)["']/gi)];
+              for (const match of assets) {
+                const asset = new URL(match[1].replaceAll('&amp;', '&'), url);
+                if (asset.origin !== new URL(base).origin) continue; // visitor-side CDN access is separate
+                if (!asset.href.startsWith(base)) throw new Error(`PR外への参照: ${asset.pathname}`);
+                await get(asset.href);
+              }
+            }
+            let ready = false;
+            let reason = 'まだ配信が確認できていません';
+            // Bounded wait: schedule can be delayed longer than this window.
+            for (let attempt = 0; attempt < 18 && Date.now() < deadline; attempt++) {
+              try {
+                const info = await (await get(`${base}preview-info.json`)).json();
+                if (info.sha !== pr.head.sha) {
+                  reason = `配信済みSHAが対象コミットと異なります (${String(info.sha).slice(0, 40)})`;
+                } else {
+                  await verifyDocument(base);
+                  for (const folder of folders) await verifyDocument(`${base}${encodeURIComponent(folder)}/`);
+                  ready = true;
+                  break;
+                }
+              } catch (error) {
+                reason = String(error.message).slice(0, 250);
+              }
+              if (attempt < 17) await new Promise(resolve => setTimeout(resolve, Math.max(0, Math.min(20000, deadline - Date.now()))));
+            }
+            const result = ready
+              ? `配信を確認しました。対象SHAが一致し、ギャラリー・変更作品のHTMLとローカルscript/linkの取得に成功しました。音とタップはPC・スマートフォンで確認してください。\n\n確認コミット: \`${pr.head.sha}\``
+              : `配信はまだ確認できません。直近の理由: ${reason}\n\n定期配信の遅延はこの待機時間を超えることがあります。上の配信ActionsのログとRun workflow、または代替artifactを使ってください。マージして解決する必要はありません。`;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo, issue_number: pr.number, per_page: 100
+            });
+            const comment = comments.find(c => c.user?.type === 'Bot' && c.body?.startsWith(marker));
+            // Never attach an old run's status to a newer PR revision.
+            const current = await github.rest.pulls.get({ ...context.repo, pull_number: pr.number });
+            if (comment && current.data.state === 'open' && current.data.head.sha === pr.head.sha && comment.body.includes(pr.head.sha)) {
+              const body = `${comment.body.split(statusMarker)[0].trim()}\n\n${statusMarker}\n### 配信確認\n\n${result}`;
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: comment.id, body });
+            }
+            if (!ready) core.warning(reason);
+            await core.summary.addHeading(ready ? 'Preview verified' : 'Preview not yet verified').addRaw(result).write();
