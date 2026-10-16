@@ -153,8 +153,18 @@ jobs:
             }
             let ready = false;
             let reason = 'まだ配信が確認できていません';
+            let disabled = false;
+            try {
+              const workflow = await github.rest.actions.getWorkflow({
+                owner: context.repo.owner, repo: `${repo}-preview`, workflow_id: 'previews.yml'
+              });
+              disabled = workflow.data.state !== 'active';
+              if (disabled) reason = `専用配信ワークフローが ${workflow.data.state} です。専用Actions画面でEnable workflowを実行してください。`;
+            } catch (error) {
+              core.warning(`専用ワークフロー状態の取得に失敗: HTTP ${error.status ?? 'unknown'}`);
+            }
             // Bounded wait: schedule can be delayed longer than this window.
-            for (let attempt = 0; attempt < 18 && Date.now() < deadline; attempt++) {
+            for (let attempt = 0; !disabled && attempt < 18 && Date.now() < deadline; attempt++) {
               try {
                 const info = await (await get(`${base}preview-info.json`)).json();
                 if (info.sha !== pr.head.sha) {
