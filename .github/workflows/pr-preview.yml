@@ -1,0 +1,109 @@
+name: PR preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited, ready_for_review, closed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    if: github.event.pull_request.state == 'open'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      # Only copy static data. Never run a build/install script from the PR.
+      - name: Package repository with relative paths intact
+        shell: python
+        run: |
+          import os, pathlib, shutil, subprocess
+          root = pathlib.Path.cwd()
+          out = pathlib.Path(os.environ['RUNNER_TEMP']) / 'pr-preview'
+          out.mkdir()
+          names = subprocess.check_output(['git', 'ls-files', '-z']).decode().split('\0')
+          for name in filter(None, names):
+              path = pathlib.PurePosixPath(name)
+              if any(p.startswith('.') for p in path.parts) or path.name == 'CNAME':
+                  continue
+              source = root.joinpath(*path.parts)
+              if not source.is_file() or source.is_symlink():
+                  continue
+              if any(parent.is_symlink() for parent in source.parents):
+                  continue
+              target = out.joinpath(*path.parts)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copyfile(source, target)
+          (out / 'PREVIEW_README.txt').write_text(
+              'Extract the whole archive. Open the ROOT folder in VSCode Live Server.\n'
+              'Do not open only the work folder: ../shared/ must remain available.\n'
+              'For a phone on the same Wi-Fi, serve this ROOT on your own PC:\n'
+              'python -m http.server 8000 --bind 0.0.0.0\n'
+              'Open http://YOUR-PC-LAN-IP:8000/ on the phone; allow the local firewall.\n'
+              'Cloud localhost is not a public URL. CDN-based works need internet.\n',
+              encoding='utf-8')
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview-pr-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/pr-preview
+          retention-days: 7
+          if-no-files-found: error
+
+  link:
+    # The deployer only accepts same-repository PRs. Forks get the artifact above.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      # No checkout and no evaluation of PR-controlled code with a write token.
+      - name: Display isolated preview URL on the PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const previewRepo = `${repo}-preview`;
+            const base = `https://${owner.toLowerCase()}.github.io/${previewRepo}/pr-${pr.number}/`;
+            const refresh = `https://github.com/${owner}/${previewRepo}/actions/workflows/previews.yml`;
+            const run = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+            const marker = '<!-- isolated-pr-preview -->';
+            let body;
+            if (pr.state === 'closed') {
+              body = `${marker}\nPRは閉じられました。専用プレビューは次の配信更新で削除されます。`;
+            } else {
+              const files = await github.paginate(github.rest.pulls.listFiles, {
+                ...context.repo, pull_number: pr.number, per_page: 100
+              });
+              const folders = [...new Set(files.filter(f => f.status !== 'removed')
+                .map(f => f.filename.split('/')[0])
+                .filter(f => /^\d+[_-][A-Za-z0-9_-]+$/.test(f)))].sort();
+              const links = folders.map(f => `- [${f}](${base}${encodeURIComponent(f)}/)`).join('\n');
+              body = [marker, '### ブラウザーで作品を確認', '',
+                `[PR #${pr.number} のプレビュー](${base})`, links, '',
+                `対象コミット: \`${pr.head.sha}\``, '',
+                'URLは予約済みです。配信済みを保証する表示ではありません。専用リポジトリが約5分間隔でPRの変更を検出します。GitHubの混雑時は大きく遅れる場合があります。', '',
+                `[反映済みコミット](${base}preview-info.json) の sha が上の対象コミットと一致したら最新版です。PC・スマートフォンから同じURLを開けます。`, '',
+                `404・古い表示・配信停止の場合: [配信Actions](${refresh}) で失敗理由を確認し、Run workflowで再実行してください。Pages未設定・Actions停止・権限不足・サイズ制限も確認します。`, '',
+                `代替: [このPRのActions](${run}) → Artifacts → preview-pr-… をダウンロードし、全体を展開して手元PCのVSCode Live Serverで開きます。詳しくは docs/pr-previews.md。`, '',
+                '本番サイトの公開元・mainは変更しません。プレビューは公開URLです。PRを閉じると次の配信更新で削除されます。'
+              ].filter(line => line !== undefined).join('\n');
+            }
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              ...context.repo, issue_number: pr.number, per_page: 100
+            });
+            const existing = comments.find(c => c.user?.type === 'Bot' && c.body?.startsWith(marker));
+            if (existing) await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
+            else await github.rest.issues.createComment({ ...context.repo, issue_number: pr.number, body });
+            await core.summary.addHeading('PR preview').addRaw(body).write();
