@@ -4,7 +4,7 @@
    textAlign, textSize, CENTER, millis, lerp, userStartAudio, getAudioContext */
 'use strict';
 const TIMING = { coin: 650, paper: 1300, relief: 1900, end: 2600 };
-const sides = [0, 1].map(index => ({ index, count: 0, started: null, paperSound: false, reliefSound: false }));
+const sides = [0, 1].map(index => ({ index, count: 0, queued: 0, started: null, paperSound: false, reliefSound: false }));
 let enabled = true, context, noise, master, voices = new Set(), revealed = false;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -24,7 +24,11 @@ function setup() {
       }
     });
     // Native click also supports keyboard and mouse.
-    button.addEventListener('click', () => purchase(side));
+    button.addEventListener('click', event => {
+      // Touch/pen was already accepted at pointerdown, including multi-touch.
+      if (event.pointerType === 'touch' || event.pointerType === 'pen') return;
+      purchase(side);
+    });
   });
   document.getElementById('sound').onclick = () => {
     enabled = !enabled;
@@ -46,10 +50,13 @@ function startAudio() {
 }
 
 function purchase(side) {
-  if (side.started !== null) return;
+  if (side.started !== null) {
+    side.queued++;
+    startAudio();
+    return;
+  }
   side.started = millis();
   side.paperSound = side.reliefSound = false;
-  document.getElementById(side.index ? 'future' : 'past').disabled = true;
   const started = side.started;
   startAudio().then(() => { if (side.started === started) sound('coin'); });
 }
@@ -58,9 +65,8 @@ function reset() {
   for (const voice of voices) { try { voice.stop(); } catch (_) { /* Already ended. */ } }
   voices.clear();
   sides.forEach(side => {
-    side.count = 0; side.started = null;
+    side.count = 0; side.queued = 0; side.started = null;
     side.paperSound = side.reliefSound = false;
-    document.getElementById(side.index ? 'future' : 'past').disabled = false;
   });
   revealed = false;
   document.getElementById('revelation').classList.remove('visible');
@@ -102,8 +108,11 @@ function draw() {
     if (age >= TIMING.end) {
       side.count++;
       side.started = null;
-      document.getElementById(side.index ? 'future' : 'past').disabled = false;
       document.getElementById('status').textContent = `${side.index ? '生命保険' : '免罪符'}を受け取りました。`;
+      if (side.queued > 0) {
+        side.queued--;
+        purchase(side);
+      }
     }
   });
   if (!revealed && sides.every(side => side.count > 0)) {
