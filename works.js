@@ -12,5 +12,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./002_jomon-room/",
     description: "物に触れ、少しずつ余白が生まれる部屋。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 3,
+    title: "Butterfly Effect",
+    url: "./003_butterfly-effect/",
+    description: "小さな羽ばたきが、遠くで大きな風になる。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];

@@ -39,3 +39,7 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 
 `shared/marpan-25d.js` は MovingSketch のコミット `eb44b094b434f4b9eb6ad0ebcbf52dfe9ca64187` から引き継いでいます。LifeSketch内の作品はこの共通ファイルを参照します。以後の変更はこのリポジトリ内で管理します。
 
+
+## LifeSketch 003 · Butterfly Effect
+
+`003_butterfly-effect/`。蝶マーパンの小さな羽ばたきが外周の竜巻へと育つ作品。タップの間隔で風の重なり方が変わり、静かにすると自然に消えます。右下から絵本用の4場面を3200×2400px PNGとして保存できます。[作品README](003_butterfly-effect/README.md)。
