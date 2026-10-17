@@ -8,7 +8,7 @@ function setup() {
   const canvas = createCanvas(scene.clientWidth, scene.clientHeight);
   canvas.parent(scene);
   pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
-  plane = { x: width * 0.27, target: width * 0.27, direction: 1, moving: false };
+  plane = { x: width * 0.27, target: width * 0.27, direction: 1, velocity: 0, moving: false };
   makeCity();
   scene.addEventListener('pointerdown', event => {
     if (!event.isPrimary || event.button > 0) return;
@@ -44,23 +44,24 @@ function makeCity() {
   randomSeed(404);
   const palette = ['#c6d3bd', '#e2c5b5', '#c5c9d9', '#e4d7b6', '#b5cfc9', '#d8bfbd'];
   // Fixed seed keeps the neighborhood still across visits and resizes.
-  const count = Math.max(5, Math.ceil(width / 132));
+  const count = Math.max(3, Math.ceil(width / 180));
   const unit = width / count;
-  const face = constrain(unit * 0.29, 24, 37);
+  const face = constrain(unit * 0.37, 36, 58);
   const floor = height - 15;
   for (let i = 0; i < count; i++) {
     const x = i * unit + 3;
     const w = unit - 6;
     const top = height * random(0.60, 0.72);
-    const columns = w > 100 ? 3 : 2;
-    const rows = Math.max(2, Math.floor((floor - top - 30) / (face * 1.25)));
+    const columns = 2;
+    const firstRow = face * 0.9;
+    const rows = Math.max(1, Math.floor((floor - top - firstRow) / (face * 1.05)));
     const building = { x, w, top, color: palette[i % palette.length], windows: [] };
     buildings.push(building);
     for (let col = 0; col < columns; col++) {
       const cx = x + (col + 0.5) * w / columns;
       addResident(cx, top - face * 0.16, face, true, building);
       for (let row = 0; row < rows; row++) {
-        const cy = top + 30 + row * (floor - top - 30) / rows;
+        const cy = top + firstRow + row * (floor - top - firstRow) / rows;
         addResident(cx, cy, face, false, building);
       }
     }
@@ -76,14 +77,7 @@ function addResident(x, y, size, roof, building) {
 function draw() {
   background('#bce4f1');
   const dt = Math.min(deltaTime / 1000, 0.05);
-  const distance = plane.target - plane.x;
-  const step = constrain(width * 0.14, 65, 180) * dt;
-  plane.moving = Math.abs(distance) > 0.1;
-  if (plane.moving) {
-    plane.direction = Math.sign(distance);
-    plane.x += Math.sign(distance) * Math.min(Math.abs(distance), step);
-    plane.moving = Math.abs(plane.target - plane.x) > 0.1;
-  }
+  updatePlane(dt);
   drawCloud(width * 0.12, height * 0.42, 0.8);
   drawCloud(width * 0.77, height * 0.16, 1.1);
   drawCloud(width * 0.90, height * 0.48, 0.6);
@@ -97,7 +91,7 @@ function draw() {
     for (let eye = 0; eye < 3; eye++) {
       person.marpan.setPupilOffset(eye,
         constrain((plane.x - person.x) / radius, -1, 1) * 0.12 * person.gaze,
-        -0.28 * person.gaze);
+        -0.30 * person.gaze);
     }
   }
   for (const building of buildings) drawBuilding(building);
@@ -105,6 +99,23 @@ function draw() {
   fill('#dfe2d4'); rect(0, height - 10, width, 10);
   updateSound();
 }
+// Analytic critically damped motion: gentle takeoff, braking and reversals,
+// independent of frame rate. Limit the spring distance to keep cruising slow.
+function updatePlane(dt) {
+  const omega = 5;
+  const maxSpeed = constrain(width * 0.14, 65, 180);
+  const offset = constrain(plane.x - plane.target, -maxSpeed / omega, maxSpeed / omega);
+  const springTarget = plane.x - offset;
+  const decay = Math.exp(-omega * dt);
+  const impulse = plane.velocity + omega * offset;
+  plane.x = springTarget + (offset + impulse * dt) * decay;
+  plane.velocity = (plane.velocity - omega * impulse * dt) * decay;
+  plane.x = constrain(plane.x, planeMargin(), width - planeMargin());
+  if (Math.abs(plane.velocity) > 0.5) plane.direction = Math.sign(plane.velocity);
+  plane.moving = Math.abs(plane.target - plane.x) > 0.15 || Math.abs(plane.velocity) > 0.5;
+  if (!plane.moving) { plane.x = plane.target; plane.velocity = 0; }
+}
+
 function drawCloud(x, y, s) {
   push(); translate(x, y); scale(s); noStroke(); fill(255, 80);
   rect(-38, 0, 76, 10, 10); ellipse(-12, 0, 32, 22); ellipse(9, -4, 35, 28); pop();
@@ -167,5 +178,6 @@ function windowResized() {
   resizeCanvas(scene.clientWidth, scene.clientHeight);
   plane.x = constrain(plane.x / oldWidth * width, planeMargin(), width - planeMargin());
   plane.target = constrain(plane.target / oldWidth * width, planeMargin(), width - planeMargin());
+  plane.velocity *= width / oldWidth;
   makeCity();
 }
