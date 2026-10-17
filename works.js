@@ -19,5 +19,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./003_butterfly-effect/",
     description: "小さな羽ばたきが、遠くで大きな風になる。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 4,
+    title: "飛行機を見上げる",
+    url: "./004_looking-up/",
+    description: "飛行機が飛ぶ。それだけで、街の三つの目が空を追いかける。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
