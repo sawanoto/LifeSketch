@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f2ec">
+<title>マーパンファンデーション · LifeSketch No.5</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><a href="../">LifeSketch <span>/ No.005</span></a><button id="sound" aria-pressed="true">音 オン</button></header>
+<main>
+<div class="title"><p>LIFE SKETCH — 005</p><h1>マーパンファンデーション</h1></div>
+<div id="scene" aria-label="マーパンの肌をタップ、またはなぞって化粧できます。"></div>
+<p class="hint">色をえらんで、そっと、なぞる。</p>
+<div class="cosmetics" role="group" aria-label="化粧品">
+<button class="cosmetic selected" id="foundation" aria-pressed="true"><span class="compact beige" aria-hidden="true"><i></i><b></b></span><span>ファンデーション</span></button>
+<button class="cosmetic" id="pink" aria-pressed="false"><span class="compact pink" aria-hidden="true"><i></i></span><span>ピンク</span></button>
+</div>
+<div class="actions"><button id="reset">リセット</button><button id="export">PNG保存 <span>3200 × 2400</span></button></div>
+<p id="status" role="status"></p>
+</main>
+<script src="../002_jomon-room/p5.min.js"></script>
+<script src="../002_jomon-room/p5.sound.min.js"></script>
+<script src="../shared/marpan-25d.js"></script>
+<script src="sketch.js"></script>
+</body>
+</html>

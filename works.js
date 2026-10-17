@@ -26,5 +26,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./004_looking-up/",
     description: "飛行機が飛ぶ。それだけで、街の三つの目が空を追いかける。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 5,
+    title: "マーパンファンデーション",
+    url: "./005_marpan-foundation/",
+    description: "肌に色を重ねる。白、ピンク、そのままの三つの目。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
