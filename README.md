@@ -51,3 +51,7 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 ## LifeSketch 005 · マーパンファンデーション
 
 `005_marpan-foundation/`。肌にファンデーションとピンクを自由に重ねます。肌色だけが変わり、三つ目と表情は変化しません。タップ・ドラッグ、控えめな合成音、リセット、現在の顔の3200×2400px PNG保存に対応。[作品README](005_marpan-foundation/README.md)。
+
+## LifeSketch 006 · 免罪符と生命保険
+
+`006_peace-of-mind/`。過去と未来、それぞれの不安にコインを渡す。左右で同じ音と動きを重ね、少し安心する作品。共通マーパン、繰り返し・同時購入、音の切り替え、リセットに対応。[作品README](006_peace-of-mind/README.md)。

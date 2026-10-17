@@ -33,5 +33,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./005_marpan-foundation/",
     description: "肌に色を重ねる。白、ピンク、そのままの三つの目。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 6,
+    title: "免罪符と生命保険",
+    url: "./006_peace-of-mind/",
+    description: "過去と未来。コインを渡す、書類を受け取る、少し安心する。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
