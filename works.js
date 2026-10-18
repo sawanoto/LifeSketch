@@ -40,5 +40,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./006_peace-of-mind/",
     description: "過去と未来。コインを渡す、書類を受け取る、少し安心する。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 7,
+    title: "イクラマーパン",
+    url: "./007_ikura-marpan/",
+    description: "ひとつぶ、ぷちっ。音と光に、旨味がふわっと広がる。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
