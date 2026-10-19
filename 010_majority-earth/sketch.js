@@ -9,9 +9,10 @@ let muted = false, audio, master, mesh = [], rotation = 0;
 const crowd = Array.from({length:24}, (_,i) => ({x:790+(i%6)*61+(Math.floor(i/6)%2)*12,y:224+Math.floor(i/6)*89, delay:i<3?1.1+i*.18:i<10?1.9+(i-3)*.10:2.8+(i-10)*.055}));
 function setup(){
   const host=document.getElementById('stage'); const c=createCanvas(host.clientWidth,host.clientHeight);c.parent(host);pixelDensity(Math.min(devicePixelRatio,2));
-  marpan=new Marpan25D({autoBlink:false,bodyColor:'#fffdf5'});buildMesh();
+  marpan=new Marpan25D({autoBlink:false,bodyColor:'#fffdf5'});buildMesh();positionChoices();
 }
-function windowResized(){const h=document.getElementById('stage');resizeCanvas(h.clientWidth,h.clientHeight);}
+function windowResized(){const h=document.getElementById('stage');resizeCanvas(h.clientWidth,h.clientHeight);positionChoices();}
+function positionChoices(){const host=document.getElementById('stage'),fit=Math.min(width/1280,height/720),controls=document.getElementById('choices');controls.style.left=`${(width-1280*fit)/2+202*fit}px`;controls.style.top=`${host.offsetTop+(height-720*fit)/2+550*fit}px`;}
 function easeUnit(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
 function elapsed(){return chosen?(performance.now()-started)/1000:-1;}
 function choose(shape){
