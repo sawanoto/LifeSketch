@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f7f5ef"><title>選択のパラドックス · LifeSketch No.008</title><link rel="stylesheet" href="style.css"></head>
+<body><header><a href="../">LifeSketch <span>/ No.008</span></a><button id="sound" aria-pressed="true">音 オン</button></header>
+<main><div class="title"><p>LIFE SKETCH — 008</p><h1>選択のパラドックス</h1></div>
+<p class="instruction">赤いジャムを、ひとつ。<br><span>どちらの売り場からでも、瓶に触れてはじめられます。</span></p>
+<div id="scene"><div id="targets" aria-label="ジャムの売り場"></div></div>
+<p id="status" role="status" aria-live="polite">最初に触れた売り場で、時間を計ります。</p>
+<section id="results" hidden aria-label="探索結果"><table><thead><tr><th></th><th>100種類</th><th>6種類</th></tr></thead><tbody><tr><th>探した時間</th><td id="time-0"></td><td id="time-1"></td></tr><tr><th>間違えた回数</th><td id="miss-0"></td><td id="miss-1"></td></tr></tbody></table><p>多いほど、選びやすい？</p></section>
+<footer><button id="reset">もう一度</button><details><summary>絵本のための PNG 保存</summary><button id="export">現在の画面を保存</button><p>長辺 4000 px・操作ボタンを除いた絵</p></details></footer></main>
+<script src="../002_jomon-room/p5.min.js"></script><script src="../002_jomon-room/p5.sound.min.js"></script><script src="../shared/marpan-25d.js"></script><script src="sketch.js"></script></body></html>
