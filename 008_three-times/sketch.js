@@ -57,8 +57,41 @@ function tone(angry) {
   oscillator.onended = () => { oscillator.disconnect(); gain.disconnect(); };
 }
 
+function clearSmoke() {
+  const host = document.getElementById('smoke');
+  host.getAnimations({ subtree: true }).forEach(animation => animation.cancel());
+  host.replaceChildren();
+}
+
+function erupt() {
+  clearSmoke();
+  const host = document.getElementById('smoke');
+  const size = host.clientWidth;
+  // Three short spurts fan outward; the face remains clear below the crown.
+  for (let index = 0; index < 9; index++) {
+    const puff = document.createElement('span');
+    puff.className = 'puff';
+    host.append(puff);
+    const direction = (index % 3) - 1;
+    const drift = direction * size * (0.14 + Math.floor(index / 3) * 0.035);
+    const rise = size * (0.30 + (index % 3 === 1 ? 0.12 : 0.02));
+    const animation = puff.animate(reducedMotion ? [
+      { opacity: 0, transform: 'translate(-50%, -110%)' },
+      { opacity: 0.65, offset: 0.2 },
+      { opacity: 0, transform: 'translate(-50%, -110%)' }
+    ] : [
+      { opacity: 0, transform: 'translate(-50%, -50%) scale(0.2)' },
+      { opacity: 0.85, offset: 0.18 },
+      { opacity: 0.55, offset: 0.6 },
+      { opacity: 0, transform: `translate(calc(-50% + ${drift}px), ${-rise}px) scale(1.25)` }
+    ], { duration: reducedMotion ? 700 : 1250, delay: Math.floor(index / 3) * 130, easing: 'ease-out', fill: 'both' });
+    animation.onfinish = () => puff.remove();
+  }
+}
+
 function turn() {
   if (!ready || rotating) return;
+  clearSmoke();
   rotating = true;
   cube.setAttribute('aria-disabled', 'true');
   const start = performance.now(), from = -90 * turns;
@@ -73,6 +106,7 @@ function turn() {
     const angry = turns % 4 === 3;
     if (angry) {
       tone(true);
+      erupt();
       if (navigator.vibrate) navigator.vibrate(25);
       if (!reducedMotion) document.querySelector('.shake').animate([
         { transform: 'translateX(0)' }, { transform: 'translateX(-2px)' },
