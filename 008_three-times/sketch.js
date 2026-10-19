@@ -36,7 +36,7 @@ function paint(angle) {
   cube.style.transform = `rotateY(${angle}deg)`;
   [...cube.children].forEach((face, index) => {
     const shade = index < 4
-      ? 0.07 + 0.15 * (1 - Math.cos((angle + index * 90 - 26 - 30) * Math.PI / 180)) / 2
+      ? 0.07 + 0.15 * (1 - Math.cos((angle + index * 90 - 30) * Math.PI / 180)) / 2
       : index === 4 ? 0.025 : 0.24;
     face.style.setProperty('--shade', shade);
   });
