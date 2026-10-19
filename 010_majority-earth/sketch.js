@@ -2,11 +2,12 @@
 'use strict';
 const symbols = {circle:'○', triangle:'△', square:'□'};
 const opposition = {circle:'square', triangle:'circle', square:'triangle'};
+const timing = Object.freeze({ reset: .22, vote: .35, send: .46, flight: .14, morph: .60, duration: .58, ready: 1.35 });
 const buttons = [...document.querySelectorAll('[data-shape]')];
 let marpan, chosen = null, majority = null, started = 0, previous = 0, sounded = 0, lowPlayed = false;
 let priorMajority = null;
 let muted = false, audio, master, mesh = [], rotation = 0;
-const crowd = Array.from({length:24}, (_,i) => ({x:790+(i%6)*61+(Math.floor(i/6)%2)*12,y:224+Math.floor(i/6)*89, delay:i<3?1.1+i*.18:i<10?1.9+(i-3)*.10:2.8+(i-10)*.055}));
+const crowd = Array.from({length:24}, (_,i) => ({x:790+(i%6)*61+(Math.floor(i/6)%2)*12,y:224+Math.floor(i/6)*89, delay:timing.vote}));
 function setup(){
   const host=document.getElementById('stage'); const c=createCanvas(host.clientWidth,host.clientHeight);c.parent(host);pixelDensity(Math.min(devicePixelRatio,2));
   marpan=new Marpan25D({autoBlink:false,bodyColor:'#fffdf5'});buildMesh();positionChoices();
@@ -16,21 +17,21 @@ function positionChoices(){const host=document.getElementById('stage'),fit=Math.
 function easeUnit(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);}
 function elapsed(){return chosen?(performance.now()-started)/1000:-1;}
 function choose(shape){
-  if(chosen&&elapsed()<8.7)return;
+  if(chosen&&elapsed()<timing.ready)return;
   previous=chosen?amount(elapsed()):0; priorMajority=majority; chosen=shape;majority=opposition[shape];started=performance.now();sounded=0;lowPlayed=false;
   buttons.forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.shape===shape));b.disabled=true;});
   document.getElementById('hint').textContent='';
-  userStartAudio().then(()=>{audio=getAudioContext();if(!master){master=audio.createGain();master.gain.value=muted?0:.65;master.connect(audio.destination);}tone(740,.6,.08);}).catch(()=>{});
+  userStartAudio().then(()=>{audio=getAudioContext();if(!master){master=audio.createGain();master.gain.value=muted?0:.65;master.connect(audio.destination);}tone(740,.22,.08);}).catch(()=>{});
 }
 function tone(freq,duration,level,low=false){
   if(!audio||audio.state!=='running'||muted)return;
   const o=audio.createOscillator(),g=audio.createGain(),t=audio.currentTime;o.type='sine';o.frequency.setValueAtTime(freq,t);o.frequency.exponentialRampToValueAtTime(low?38:freq*.87,t+duration);
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(level,t+.025);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(master);o.start();o.stop(t+duration+.03);o.onended=()=>{o.disconnect();g.disconnect();};
 }
-function amount(t){return easeUnit((t-4.1)/2.8);}
+function amount(t){return easeUnit((t-timing.morph)/timing.duration);}
 function draw(){
   const t=elapsed();rotation+=Math.min(deltaTime,50)*.000065;
-  if(chosen){let n=crowd.filter(c=>t>=c.delay).length;while(sounded<n){tone(320+(sounded%5)*41,.44,.023);sounded++;}if(t>4.1&&!lowPlayed){tone(105,2.7,.12,true);lowPlayed=true;}if(t>8.7){buttons.forEach(b=>b.disabled=false);document.getElementById('status').textContent=`あなたは${symbols[chosen]}、24体は${symbols[majority]}。地球は${symbols[majority]}。`;}}
+  if(chosen){let n=crowd.filter(c=>t>=c.delay).length;while(sounded<n){tone(320+(sounded%5)*41,.18,.016);sounded++;}if(t>=timing.morph&&!lowPlayed){tone(105,.55,.12,true);lowPlayed=true;}if(t>=timing.ready){buttons.forEach(b=>b.disabled=false);document.getElementById('status').textContent=`あなたは${symbols[chosen]}、24体は${symbols[majority]}。地球は${symbols[majority]}。`;}}
   renderScene(t,chosen,majority,rotation);
 }
 function renderScene(t,choice,vote,angle){
@@ -41,8 +42,8 @@ function renderScene(t,choice,vote,angle){
   marpan.drawAt(202,480,{bodyWidth:130,bodyHeight:88,lookX:630,lookY:380,yaw:0});
   if(choice)badge(202,362,choice,70,'#397f78');
   const morph=choice?amount(t):0;
-  if(choice&&t>=4.1&&t<6.9){for(let i=0;i<24;i++){const c=crowd[i],f=((t-4.1)*.8+i/24)%1;let e=easeUnit(f);push();translate(lerp(c.x,635,e),lerp(c.y-40,365,e)-sin(f*PI)*45);stroke(107,135,104,(1-f)*145);noFill();strokeWeight(1.5);symbol(vote,18*(1-f)+7);pop();}}
-  earth(choice&&t<.8?priorMajority:vote,choice&&t<.8?previous*(1-easeUnit(t/.8)):morph,angle);
+  if(choice&&t>=timing.send&&t<timing.morph){for(let i=0;i<24;i++){const c=crowd[i],f=Math.min(1,(t-timing.send)/timing.flight);let e=easeUnit(f);push();translate(lerp(c.x,635,e),lerp(c.y-40,365,e)-sin(f*PI)*45);stroke(107,135,104,(1-f)*145);noFill();strokeWeight(1.5);symbol(vote,18*(1-f)+7);pop();}}
+  earth(choice&&t<timing.reset?priorMajority:vote,choice&&t<timing.reset?previous*(1-easeUnit(t/timing.reset)):morph,angle);
   noStroke();fill('#9aa28f');textAlign(CENTER,CENTER);textSize(11);textFont('sans-serif');text('01',202,563);text('24',972,615);pop();
 }
 function symbol(s,size){if(s==='circle')circle(0,0,size);if(s==='square')rect(-size/2,-size/2,size,size,1);if(s==='triangle')triangle(0,-size*.58,-size*.54,size*.4,size*.54,size*.4);}
@@ -64,6 +65,6 @@ document.getElementById('sound').addEventListener('click',e=>{muted=!muted;e.tar
 document.querySelectorAll('[data-export]').forEach(b=>b.addEventListener('click',()=>{
   // Re-render vectors at print resolution; never upscale a screen capture.
   const w=width,h=height,d=pixelDensity();noLoop();pixelDensity(1);resizeCanvas(3840,2160,true);
-  const scene=b.dataset.export;renderScene(scene==='initial'?-1:scene==='voices'?3.8:9,scene==='initial'?null:chosen||'circle',majority||'square',.35);
+  const scene=b.dataset.export;renderScene(scene==='initial'?-1:scene==='voices'?timing.vote+.05:timing.ready,scene==='initial'?null:chosen||'circle',majority||'square',.35);
   saveCanvas(`lifesketch-010-${scene}-${chosen||'circle'}-3840x2160`,'png');pixelDensity(d);resizeCanvas(w,h,true);loop();
 }));
