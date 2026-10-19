@@ -47,5 +47,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./007_ikura-marpan/",
     description: "ひとつぶ、ぷちっ。音と光に、旨味がふわっと広がる。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 8,
+    title: "選択のパラドックス",
+    url: "./008_paradox-of-choice/",
+    description: "赤いジャムを、ひとつ。100種類と6種類、ふたつの売り場で探す。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
