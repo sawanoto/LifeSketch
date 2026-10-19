@@ -54,5 +54,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./008_paradox-of-choice/",
     description: "赤いジャムを、ひとつ。100種類と6種類、ふたつの売り場で探す。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 9,
+    title: "仏の顔も三度まで",
+    url: "./008_three-times/",
+    description: "ひとつ回す。もうひとつ回す。三度目に出会う顔。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
