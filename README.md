@@ -64,6 +64,10 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 
 `008_paradox-of-choice/`。100種類と6種類から、同じ赤いジャムを探します。探索時間と不正解回数を実測し、最後に並べて表示。リセット・音の切り替え・長辺4000pxのPNG保存に対応。[操作と実装](008_paradox-of-choice/README.md)。
 
-## LifeSketch 011 · Happiness / Sadness
+## LifeSketch 011 · 怒りの炎
+
+`011_anger-flame/`。漂う7つの煩悩を内なる炎に投げ込む。触れ続けると炎が育ち、手を止めると小さな熾火へ戻ります。共通マーパンの三つ目と怒り顔、連続投入に重なる燃焼音、3場面の3200×2400px PNG保存に対応。[操作と実装](011_anger-flame/README.md)。
+
+## LifeSketch 012 · Happiness / Sadness
 
 `011_happiness-sadness/`。浮かぶ。沈む。手を離して、眺める。連打・長押しと自然な中央への復帰、控えめな音、3200×2400 PNG保存に対応。[操作と実装](011_happiness-sadness/README.md)。

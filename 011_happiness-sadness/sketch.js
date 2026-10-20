@@ -80,7 +80,7 @@ function renderScene(printScale = 1) {
   const span = width + 40 * printScale;
   for (let i = 0; i < 36; i++) {
     const x = ((i * 0.61803398875 * span - time * 26 * printScale) % span + span) % span - 20 * printScale;
-    const y = (0.08 + ((i * 0.38196601125) % 1) * 0.84) * height;
+    const y = (0.08 + ((Math.sin(i * 127.1 + 19.7) * 43758.5453) % 1 + 1) % 1 * 0.84) * height;
     const radius = (i % 3 === 0 ? 2.4 : 1.7) * printScale;
     const ctx = drawingContext;
     const trail = ctx.createLinearGradient(x, y, x + 22 * printScale, y);
@@ -108,7 +108,7 @@ function exportPNG() {
   snapshot.toBlob(blob => {
     if (!blob) { document.getElementById('status').textContent = '保存できませんでした。'; return; }
     const url = URL.createObjectURL(blob), link = document.createElement('a');
-    link.href = url; link.download = `lifesketch-011-${Date.now()}.png`; link.click();
+    link.href = url; link.download = `lifesketch-012-${Date.now()}.png`; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 60000);
     document.getElementById('status').textContent = 'PNGを書き出しました。';
   }, 'image/png');
