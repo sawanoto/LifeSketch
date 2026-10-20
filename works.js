@@ -68,5 +68,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./010_majority-earth/",
     description: "ひとつの声と、24の声。地球の形がゆっくり変わる。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 11,
+    title: "怒りの炎",
+    url: "./011_anger-flame/",
+    description: "漂うことばを、内なる炎へ。手を止めると、熾火に戻る。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
