@@ -75,5 +75,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./011_anger-flame/",
     description: "漂うことばを、内なる炎へ。手を止めると、熾火に戻る。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 12,
+    title: "Happiness / Sadness",
+    url: "./011_happiness-sadness/",
+    description: "浮かぶ。沈む。手を離して、眺める。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
