@@ -46,14 +46,14 @@ function setup() {
   previous = performance.now();
 }
 function geometry() {
-  const w = Math.min(width * 0.55, height * 0.72, 460);
+  const w = Math.min(width * 0.55, height * 0.72, 460 * Math.max(1, width / 1200));
   return { x: width / 2, y: height * 0.51, w, h: w * 0.68 };
 }
 // Seven separate elliptical sectors leave an empty region around all three eyes.
 function floatingPosition(index, time) {
   const angle = -Math.PI / 2 + index * Math.PI * 2 / 7;
   const wobble = reducedMotion ? 0 : Math.sin(time * 0.29 + index * 2.3) * 0.035;
-  const rx = Math.min(width * 0.38, 395), ry = height * 0.36;
+  const rx = Math.min(width * 0.38, 395 * Math.max(1, width / 1200)), ry = height * 0.36;
   return { x: width / 2 + Math.cos(angle + wobble) * rx,
     y: height * 0.51 + Math.sin(angle + wobble) * ry };
 }
