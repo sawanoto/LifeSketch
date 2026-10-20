@@ -68,5 +68,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./010_majority-earth/",
     description: "ひとつの声と、24の声。地球の形がゆっくり変わる。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 11,
+    title: "Happiness / Sadness",
+    url: "./011_happiness-sadness/",
+    description: "浮かぶ。沈む。手を離して、眺める。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
