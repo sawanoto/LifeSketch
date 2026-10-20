@@ -1,5 +1,5 @@
 /* global Marpan25D, MoodMotion, createCanvas, pixelDensity, resizeCanvas, width, height,
- background, stroke, strokeWeight, line, push, pop, translate, scale, drawingContext,
+ background, stroke, strokeWeight, line, noStroke, fill, circle, push, pop, translate, scale, drawingContext,
  userStartAudio, getAudioContext */
 'use strict';
 const mood = new MoodMotion();
@@ -72,16 +72,31 @@ function draw() {
   renderScene();
 }
 function renderScene(printScale = 1) {
-  background('#f6f3ed'); stroke('#dfded6'); strokeWeight(1);
-  for (let i = 0; i < 28; i++) {
-    const x = ((i * 0.61803398875 * width - time * 9) % width + width) % width;
-    const y = ((i * 0.38196601125) % 1) * height;
-    line(x, y, x + (i % 3 === 0 ? 7 : 2), y);
+  background('#f6f3ed');
+  // A quiet, fixed horizon makes the resting height visible.
+  stroke('#d2cec2'); strokeWeight(printScale);
+  line(width * 0.06, height / 2, width * 0.94, height / 2);
+  // Identical speed in every mood. The short luminous tail points upstream.
+  const span = width + 40 * printScale;
+  for (let i = 0; i < 36; i++) {
+    const x = ((i * 0.61803398875 * span - time * 26 * printScale) % span + span) % span - 20 * printScale;
+    const y = (0.08 + ((i * 0.38196601125) % 1) * 0.84) * height;
+    const radius = (i % 3 === 0 ? 2.4 : 1.7) * printScale;
+    const ctx = drawingContext;
+    const trail = ctx.createLinearGradient(x, y, x + 22 * printScale, y);
+    trail.addColorStop(0, 'rgba(188,155,77,0.48)');
+    trail.addColorStop(1, 'rgba(188,155,77,0)');
+    ctx.save(); ctx.strokeStyle = trail; ctx.lineWidth = printScale;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 22 * printScale, y); ctx.stroke();
+    ctx.shadowColor = '#e9c76c'; ctx.shadowBlur = 9 * printScale;
+    noStroke(); fill('#c7a455'); circle(x, y, radius * 2);
+    fill('#fff7d9'); circle(x - radius * 0.2, y - radius * 0.2, radius);
+    ctx.restore();
   }
-  const bodyW = Math.min(width * 0.43, height * 0.28, 250 * printScale), bodyH = bodyW * 0.68;
+  const bodyW = Math.min(width * 0.43, height * 0.28, 250 * printScale) * 0.78, bodyH = bodyW * 0.68;
   push(); translate(width / 2, height / 2 + mood.y * bodyH); scale(bodyW / 1000);
   marpan.drawBody(0, 0, 1000, 680, 0, '#e4bea0');
-  marpan.beginClip(0, 0, 1000, 680, 0); marpan.drawEyes(0, 0, 1000, 680, 0, 0, 0); drawingContext.restore(); pop();
+  marpan.beginClip(0, 0, 1000, 680, 0); marpan.drawEyes(0, 0, 1000, 680, 0.65, 350, 0); drawingContext.restore(); pop();
 }
 function windowResized() { resizeCanvas(window.innerWidth, document.querySelector('main').clientHeight); }
 function exportPNG() {
