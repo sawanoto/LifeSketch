@@ -82,5 +82,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./011_happiness-sadness/",
     description: "浮かぶ。沈む。手を離して、眺める。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 13,
+    title: "怒りの伝染",
+    url: "./013_anger-contagion/",
+    description: "ひとつの炎から、隣の誰かへ。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
