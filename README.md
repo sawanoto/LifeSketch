@@ -71,3 +71,7 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 ## LifeSketch 012 · Happiness / Sadness
 
 `011_happiness-sadness/`。浮かぶ。沈む。手を離して、眺める。連打・長押しと自然な中央への復帰、控えめな音、3200×2400 PNG保存に対応。[操作と実装](011_happiness-sadness/README.md)。
+
+## LifeSketch 013 · 怒りの伝染
+
+`013_anger-contagion/`。中央の小さな炎に触れると、煙が隣の誰かへ届き、怒りが連鎖します。最後まで穏やかな2体、リセット、控えめな燃焼音、3場面の3200×2400px PNG保存に対応。[操作と実装](013_anger-contagion/README.md)。
