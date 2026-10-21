@@ -11,8 +11,9 @@ function setup() {
   createCanvas(host.clientWidth, host.clientHeight).parent(host);
   pixelDensity(Math.min(devicePixelRatio || 1, 2));
   marpan = new Marpan25D({ autoBlink: false });
-  const cols = width < 600 ? 5 : width < 1000 ? 9 : 11;
-  const rows = Math.max(5, Math.min(11, Math.floor(height / (width / cols)) | 1));
+  // More neighbours and longer wavefronts, with legible faces on phones.
+  const cols = width < 600 ? 7 : width < 1000 ? 13 : 19;
+  const rows = Math.max(7, Math.min(17, Math.floor(height / (width / cols)) | 1));
   board = AngerContagion.makeBoard(cols, rows);
   new ResizeObserver(() => { resizeCanvas(host.clientWidth, host.clientHeight); positionTrigger(); }).observe(host);
   document.getElementById('ignite').onclick = () => {
