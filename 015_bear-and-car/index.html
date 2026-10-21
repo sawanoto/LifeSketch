@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ja">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#f5f2e9"><title>クマと車 · LifeSketch 015</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header><a href="../">LIFESketch <span> / 015</span></a></header>
+<main>
+<div class="title"><p>BEAR AND CAR</p><h1>クマと車</h1></div>
+<div class="labels" aria-hidden="true"><span>クマ</span><span>車</span></div>
+<div id="stage"></div>
+<p class="question">「怖いもの」と「危険なもの」は、同じだろうか。</p>
+<div class="controls"><button id="start" type="button">開始</button><button id="reset" type="button">リセット</button><button id="probability" type="button" aria-expanded="false" aria-controls="statistics">確率を見る</button></div>
+<p id="status" role="status">開始して、しばらく眺めてみる。</p>
+<section id="statistics" hidden aria-label="年間リスクと出典">
+<h2>全国人口当たりの年間リスク</h2>
+<div class="risks"><p>交通事故による死傷<br><strong>約338人に1人</strong></p><p>クマによる人身被害<br><strong>約57万人に1人</strong></p></div>
+<p class="ratio">被害頻度の比率：約1,689対1</p>
+<p class="note">全国人口当たりの年間死傷リスクを比較した表現です。車やクマとの遭遇1回当たりの危険度を示すものではありません。</p>
+<details><summary>対象年・計算方法・参照元</summary>
+<p>対象期間：2023年1月〜12月。人口：124,352,000人（2023年10月1日）。2026年10月21日確認。最新年の推計ではなく、同じ暦年にそろえた比較です。</p>
+<ul><li><a href="https://www.npa.go.jp/hanzaihigai/whitepaper/2024/zenbun/part3_siryo/siryo-12.html">警察庁：令和6年版犯罪被害者白書・資料12</a>：24時間以内死者2,678人＋負傷者365,595人＝368,273人。道路交通事故全体を車のシルエットで表しています。</li>
+<li>環境省：<a href="https://www.env.go.jp/nature/choju/effort/effort12/r04injury-qe.pdf">令和4年度月別表</a>の2023年1〜3月（0＋1＋0人）と、<a href="https://www.env.go.jp/nature/choju/effort/effort12/r05injury-qe.pdf">令和5年度月別表</a>の4〜12月（5＋17＋17＋17＋15＋38＋73＋30＋5人）を合算＝218人。死亡者を含む被害者数を使用し、死亡者を再加算しません。</li>
+<li><a href="https://www.stat.go.jp/data/jinsui/2023np/index.html">総務省統計局：2023年10月1日現在人口推計</a>。</li></ul>
+<p>年間リスク＝年間被害者数÷全国人口。人口÷被害者数は交通事故337.66人、クマ570,422.02人。比率＝368,273÷218＝1,689.33。通過との同期のため1,689回に丸め、クマの被害間隔は3秒×1,689＝5,067秒（84分27秒）。初回も同じ時間だけ待ちます。ランダム判定は使いません。</p>
+<p>地域、活動、遭遇頻度による差や、重症度の違いを表すものではありません。人数の集計に基づく概算で、個人の将来の被害確率を予測するものではありません。</p>
+</details></section>
+<div class="export"><button id="export" type="button">この場面をPNGに保存</button><span>3200 × 2400 px</span></div>
+</main><footer>LifeSketch — 015</footer>
+<script src="../002_jomon-room/p5.min.js"></script><script src="../shared/marpan-25d.js"></script><script src="timing.js"></script><script src="sketch.js"></script>
+</body></html>

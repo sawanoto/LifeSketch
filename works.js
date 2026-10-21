@@ -96,5 +96,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./014_refracting-glasses/",
     description: "眼鏡を上下に動かす。期待・現実・不安へ、変わる視線。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 15,
+    title: "クマと車",
+    url: "./015_bear-and-car/",
+    description: "ふたつの影が通り過ぎる。その違いを、眺める。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
