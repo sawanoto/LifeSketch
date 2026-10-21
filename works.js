@@ -94,7 +94,7 @@ window.LIFE_SKETCH_WORKS = [
     number: 14,
     title: "屈折する眼鏡",
     url: "./014_refracting-glasses/",
-    description: "眼鏡を上下に動かす。同じ木へ、違う視点から。",
+    description: "眼鏡を上下に動かす。期待・現実・不安へ、変わる視線。",
     tags: ["p5.js", "Interactive"]
   }
 ];

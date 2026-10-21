@@ -14,7 +14,7 @@ function setup() {
   const canvas = createCanvas(stage.clientWidth, stage.clientHeight);
   canvas.parent(stage);
   canvas.elt.setAttribute('role', 'img');
-  canvas.elt.setAttribute('aria-label', '左に三つ目のマーパン、中央に凸レンズ、右に同じ姿の木。上から期待、現実、不安。点線の視線がレンズで曲がります。');
+  canvas.elt.setAttribute('aria-label', '左に三つ目のマーパン、中央に凸レンズ、右に3本の木。期待はリンゴの実る木、現実は緑の木、不安は枯れ木。上から期待、現実、不安。点線の視線がレンズで曲がります。');
   pixelDensity(Math.min(window.devicePixelRatio || 1, 2));
   marpan = new Marpan25D({ expression: 'pupil', yaw: .18 });
   noLoop();
@@ -95,15 +95,36 @@ function draw() {
 }
 function drawTree(x, y, size, label) {
   push(); translate(x, y);
-  // Identical geometry, palette, and label styling for all three trees.
+  // Keep the scale and trunk shared; fruit and bare branches clarify the themes.
   stroke('#8b806c'); strokeWeight(size * .065); strokeCap(ROUND);
   line(0, size * .48, 0, -size * .12);
   line(0, size * .14, -size * .19, -size * .08);
   line(0, size * .07, size * .2, -size * .17);
-  noStroke(); fill('#a6b59b');
-  ellipse(-size * .21, -size * .1, size * .48, size * .52);
-  ellipse(size * .2, -size * .15, size * .5, size * .55);
-  ellipse(0, -size * .33, size * .55, size * .58);
+  if (label === '不安') {
+    stroke('#8b806c'); strokeWeight(size * .035);
+    line(0, -size * .12, -size * .07, -size * .53);
+    line(-size * .04, -size * .33, size * .16, -size * .5);
+    line(-size * .19, -size * .08, -size * .32, -size * .31);
+    line(-size * .24, -size * .17, -size * .39, -size * .19);
+    line(size * .2, -size * .17, size * .3, -size * .4);
+    line(size * .23, -size * .24, size * .39, -size * .28);
+  } else {
+    noStroke(); fill('#a6b59b');
+    ellipse(-size * .21, -size * .1, size * .48, size * .52);
+    ellipse(size * .2, -size * .15, size * .5, size * .55);
+    ellipse(0, -size * .33, size * .55, size * .58);
+    if (label === '期待') {
+      for (const [ax, ay] of [[-.24, -.08], [.2, -.16], [-.04, -.38]]) {
+        push(); translate(ax * size, ay * size);
+        stroke('#78664d'); strokeWeight(size * .016);
+        line(0, -size * .035, size * .012, -size * .09);
+        noStroke(); fill('#b96552');
+        ellipse(-size * .022, 0, size * .085, size * .10);
+        ellipse(size * .022, 0, size * .085, size * .10);
+        pop();
+      }
+    }
+  }
   stroke('#bfb7a7'); strokeWeight(1); line(-size * .34, size * .49, size * .34, size * .49);
   noStroke(); fill('#625f55'); textAlign(CENTER, BOTTOM);
   textFont('serif'); textSize(clamp(width * .025, 17, 22));
