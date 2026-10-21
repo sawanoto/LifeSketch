@@ -82,5 +82,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./011_happiness-sadness/",
     description: "浮かぶ。沈む。手を離して、眺める。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 13,
+    title: "怒りの煙",
+    url: "./013_anger-smoke/",
+    description: "ふたり、ひと部屋。頭から立ちのぼる煙と、残る空気。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
