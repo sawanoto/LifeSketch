@@ -89,5 +89,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./013_anger-contagion/",
     description: "ひとつの炎から、隣の誰かへ。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 14,
+    title: "屈折する眼鏡",
+    url: "./014_refracting-glasses/",
+    description: "眼鏡を上下に動かす。同じ木へ、違う視点から。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
