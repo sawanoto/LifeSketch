@@ -85,8 +85,15 @@ window.LIFE_SKETCH_WORKS = [
   },
   {
     number: 13,
+    title: "怒りの伝染",
+    url: "./013_anger-contagion/",
+    description: "ひとつの炎から、隣の誰かへ。",
+    tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 14,
     title: "怒りの煙",
-    url: "./013_anger-smoke/",
+    url: "./014_anger-smoke/",
     description: "ふたり、ひと部屋。頭から立ちのぼる煙と、残る空気。",
     tags: ["p5.js", "Sound", "Interactive"]
   }
