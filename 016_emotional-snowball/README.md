@@ -1,4 +1,4 @@
-# LifeSketch 016 · 感情の雪だるま / Emotional Snowball
+# LifeSketch 018 · 感情の雪だるま / Emotional Snowball
 
 笑顔・無表情・泣き顔の3体を自由に転がす、無音のp5.js作品。思想の説明、評価、得点、演出効果は表示しません。
 

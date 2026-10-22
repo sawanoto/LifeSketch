@@ -84,6 +84,10 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 
 `015_bear-and-car/`。ふたつの影が通り過ぎる。車は3秒ごと、クマは約84分ごとにマーパンが倒れます。2023年の公的統計を同じ暦年で比較。開始・リセット・確率表示・3200×2400px PNG保存に対応。[操作と統計の出典](015_bear-and-car/README.md)。
 
-## LifeSketch 016 · 感情の雪だるま
+## LifeSketch 017 · 過去の杭 / Anchored to the Past
+
+`016_anchored-to-the-past/`。杭が流れる。糸が残る。一定速度の粒子と杭、中央の共通マーパン、消えずに蓄積する糸。クリック・タップに対応。[操作と実装](016_anchored-to-the-past/README.md)。
+
+## LifeSketch 018 · 感情の雪だるま
 
 `016_emotional-snowball/`。笑顔・無表情・泣き顔をつかんで転がすと、それぞれが少しずつ大きくなります。全体の回転、自由な重なり、前面への選択、リセット、マウス・タッチに対応。[操作と実装](016_emotional-snowball/README.md)。
