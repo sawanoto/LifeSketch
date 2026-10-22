@@ -92,8 +92,22 @@ window.LIFE_SKETCH_WORKS = [
   },
   {
     number: 14,
+    title: "屈折する眼鏡",
+    url: "./014_refracting-glasses/",
+    description: "眼鏡を上下に動かす。期待・現実・不安へ、変わる視線。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 15,
+    title: "クマと車",
+    url: "./015_bear-and-car/",
+    description: "ふたつの影が通り過ぎる。その違いを、眺める。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 16,
     title: "怒りの煙",
-    url: "./014_anger-smoke/",
+    url: "./016_anger-smoke/",
     description: "ふたり、ひと部屋。頭から立ちのぼる煙と、残る空気。",
     tags: ["p5.js", "Sound", "Interactive"]
   }
