@@ -1,8 +1,8 @@
 /* global Marpan25D */
 'use strict';
 
-const FLOW_SPEED = 24; // CSS pixels / second, shared by every particle and stake.
-const THREAD_COLOR = 'rgba(174,185,195,0.24)';
+const FLOW_SPEED = 36; // CSS pixels / second, shared by every particle and stake.
+const THREAD_COLOR = 'rgba(183,170,145,0.65)';
 let marpan;
 let bodySize;
 let elapsedDistance = 0;
@@ -46,15 +46,25 @@ function advanceTime(now) {
 }
 
 function attachment() {
-  return { x: width / 2 - bodySize * 0.44, y: height / 2 + bodySize * 0.12 };
+  return { x: width / 2, y: height / 2 };
 }
 
 function drawThread(context, x, y) {
   const origin = attachment();
+  context.save();
+  context.lineCap = 'round';
+  context.strokeStyle = THREAD_COLOR;
+  context.lineWidth = 2.2;
   context.beginPath();
   context.moveTo(origin.x, origin.y);
   context.lineTo(x, y);
   context.stroke();
+  // A fine, broken highlight gives the cord a quiet twisted texture.
+  context.strokeStyle = 'rgba(235,224,201,0.5)';
+  context.lineWidth = 0.65;
+  context.setLineDash([2, 4]);
+  context.stroke();
+  context.restore();
 }
 
 function rebuildPastLayer() {
@@ -63,8 +73,6 @@ function rebuildPastLayer() {
   pastLayer = createGraphics(width, height);
   pastLayer.pixelDensity(1);
   const context = pastLayer.drawingContext;
-  context.strokeStyle = THREAD_COLOR;
-  context.lineWidth = 0.65;
   for (const y of pastThreads) drawThread(context, 0, y * height);
 }
 
@@ -74,8 +82,23 @@ function draw() {
   noStroke();
   for (const particle of particles) {
     const x = ((particle.x * width - elapsedDistance) % width + width) % width;
+    const y = particle.y * height;
+    const trailLength = 28 + particle.size * 14;
+    // Repeat the fading tail across the wrap boundary, without a bright seam.
+    for (const headX of [x, x - width]) {
+      const trail = drawingContext.createLinearGradient(headX, y, headX + trailLength, y);
+      trail.addColorStop(0, `rgba(201,213,224,${particle.alpha / 255})`);
+      trail.addColorStop(1, 'rgba(201,213,224,0)');
+      drawingContext.strokeStyle = trail;
+      drawingContext.lineWidth = particle.size * 0.65;
+      drawingContext.beginPath();
+      drawingContext.moveTo(headX, y);
+      drawingContext.lineTo(headX + trailLength, y);
+      drawingContext.stroke();
+    }
+    noStroke();
     fill(201, 213, 224, particle.alpha);
-    circle(x, particle.y * height, particle.size);
+    circle(x, y, particle.size);
   }
 
   // Compact the active array in place, avoiding splice/filter allocation.
@@ -89,12 +112,16 @@ function draw() {
     }
   }
   stakes.length = remaining;
+  marpan.drawAt(width / 2, height / 2, {
+    bodyWidth: bodySize, bodyHeight: bodySize * 0.92,
+    yaw: 1.05, lookX: width / 2 + bodySize, lookY: height / 2,
+    pulse: 0, expression: 'pupil'
+  });
+  // Draw cords over the body so the central attachment remains visible.
   image(pastLayer, 0, 0);
 
   const context = drawingContext;
   context.save();
-  context.strokeStyle = THREAD_COLOR;
-  context.lineWidth = 0.65;
   for (const stake of stakes) {
     drawThread(context, stake.worldX - elapsedDistance, stake.y * height);
   }
@@ -108,11 +135,7 @@ function draw() {
     line(x, y - 4, x, y + 5);
     line(x - 3, y - 4, x + 3, y - 4);
   }
-  marpan.drawAt(width / 2, height / 2, {
-    bodyWidth: bodySize, bodyHeight: bodySize * 0.92,
-    yaw: 1.05, lookX: width / 2 + bodySize, lookY: height / 2,
-    pulse: 0, expression: 'pupil'
-  });
+
 }
 
 function windowResized() {
