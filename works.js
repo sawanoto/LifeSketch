@@ -103,5 +103,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./015_bear-and-car/",
     description: "ふたつの影が通り過ぎる。その違いを、眺める。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 16,
+    title: "過去の杭 / Anchored to the Past",
+    url: "./016_anchored-to-the-past/",
+    description: "杭が流れる。糸が残る。",
+    tags: ["p5.js", "Interactive"]
   }
 ];

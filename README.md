@@ -83,3 +83,7 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 ## LifeSketch 015 · クマと車
 
 `015_bear-and-car/`。ふたつの影が通り過ぎる。車は3秒ごと、クマは約84分ごとにマーパンが倒れます。2023年の公的統計を同じ暦年で比較。開始・リセット・確率表示・3200×2400px PNG保存に対応。[操作と統計の出典](015_bear-and-car/README.md)。
+
+## LifeSketch 016 · 過去の杭 / Anchored to the Past
+
+`016_anchored-to-the-past/`。杭が流れる。糸が残る。一定速度の粒子と杭、中央の共通マーパン、消えずに蓄積する糸。クリック・タップに対応。[操作と実装](016_anchored-to-the-past/README.md)。
