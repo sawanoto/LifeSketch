@@ -3,13 +3,13 @@ const assert = require('node:assert/strict');
 const Motion = require('../motion.js');
 test('growth is independent of direction, expression, and pointer sample spacing, including cap crossing', () => {
   const coarse = new Motion('happy', 0, 0), fine = new Motion('crying', 0, 0);
-  for (let i = 0; i < 140; i++) {
+  for (let i = 0; i < 240; i++) {
     coarse.moveTo(i % 2 ? 0 : 100, 0, 1000, 1000);
     for (let j = 1; j <= 10; j++) fine.moveTo(i % 2 ? 100-j*10 : j*10, 0, 1000, 1000);
     assert(Math.abs(coarse.diameter(1000, 1000) - fine.diameter(1000, 1000)) < 1e-8);
     assert(Math.abs(coarse.angle - fine.angle) < 1e-8);
   }
-  assert.equal(coarse.diameter(1000, 1000), 860);
+  assert.equal(coarse.diameter(1000, 1000), 1000 / 0.68 * 1.05);
 });
 test('stationary pointers do nothing; vertical and diagonal movement grow; clamped movement counts actual travel', () => {
   const ball = new Motion('normal', 50, 50);

@@ -1,6 +1,6 @@
 /* global SnowballMotion, Marpan25D, createCanvas, pixelDensity, resizeCanvas,
  width, height, background, push, pop, translate, rotate, scale, drawingContext,
- noFill, stroke, strokeWeight, arc, PI, noStroke, fill, bezier, beginShape,
+ noStroke, fill, beginShape,
  vertex, bezierVertex, endShape, CLOSE */
 'use strict';
 let balls = [], drag = null, canvasElement;
@@ -9,6 +9,7 @@ function resetScene() {
   balls = ['happy', 'normal', 'crying'].map((expression, i) => {
     const ball = new SnowballMotion(expression, width * (0.25 + i * 0.25), height / 2);
     ball.renderer = new Marpan25D({bodyColor:'#e4bea0', autoBlink:false});
+    ball.renderer.setExpressionState('normal');
     ball.renderer.setExpression(expression === 'normal' ? 'pupil' : expression);
     return ball;
   });
@@ -70,7 +71,7 @@ function hit(ball, x, y) {
   const localY = (-dx * s + dy * c) * 1000 / diameter;
   // Use the shared body's actual silhouette, including after rotation.
   const ctx = drawingContext; ctx.save(); ctx.resetTransform();
-  ball.renderer.beginClip(0, 0, 1000, 1000, 0);
+  ball.renderer.beginClip(0, 0, 1000, ball.renderer.getBodyHeight(1000), 0);
   const inside = ctx.isPointInPath(localX, localY);
   ctx.restore(); ctx.restore(); return inside;
 }
@@ -79,13 +80,8 @@ function draw() {
   for (const ball of balls) {
     const diameter = ball.diameter(width, height);
     push(); translate(ball.x, ball.y); rotate(ball.angle); scale(diameter / 1000);
-    ball.renderer.drawAt(0, 0, {bodyWidth:1000, bodyHeight:1000, lookX:0, lookY:0});
-    noFill(); stroke('#121212'); strokeWeight(10);
-    if (ball.expression === 'happy') arc(0, 220, 160, 100, 0, PI);
-    else if (ball.expression === 'normal') {
-      bezier(-65, 245, -20, 245, 20, 245, 65, 245);
-    } else {
-      arc(0, 275, 150, 95, PI, PI * 2);
+    ball.renderer.drawAt(0, 0, {bodyWidth:1000, lookX:0, lookY:0});
+    if (ball.expression === 'crying') {
       noStroke(); fill('#8ab8c7');
       for (const side of [-1, 1]) {
         const x = side * 230;

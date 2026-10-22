@@ -5,10 +5,10 @@ class SnowballMotion {
     Object.assign(this, {expression, x, y, distance:0, angle:0});
   }
   diameter(w, h) {
-    const side = Math.min(w, h);
+    const maximum = Math.max(w, h / 0.68) * 1.05;
     const initial = Math.min(w * 0.21, h * 0.24, 148);
-    // Twelve short-side traversals reach the cap, equally for all expressions.
-    return initial + (side * 0.86 - initial) * Math.min(1, this.distance / 12);
+    // Twenty short-side traversals reach the cap, equally for all expressions.
+    return initial + (maximum - initial) * Math.min(1, this.distance / 20);
   }
   moveTo(x, y, w, h) {
     const nx = Math.max(0, Math.min(w, x));
@@ -17,7 +17,7 @@ class SnowballMotion {
     const length = Math.hypot(dx, dy);
     if (!length) return;
     const before = this.diameter(w, h);
-    const growingLength = Math.min(length, Math.max(0, 12 - this.distance) * Math.min(w, h));
+    const growingLength = Math.min(length, Math.max(0, 20 - this.distance) * Math.min(w, h));
     this.distance += length / Math.min(w, h);
     const after = this.diameter(w, h);
     // Integrate ds/r for a linearly growing radius (independent of event spacing).
