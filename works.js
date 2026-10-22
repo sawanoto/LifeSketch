@@ -117,5 +117,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./016_anchored-to-the-past/",
     description: "杭が流れる。糸が残る。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 18,
+    title: "感情の雪だるま / Emotional Snowball",
+    url: "./016_emotional-snowball/",
+    description: "つかんで、ころがす。少しずつ、大きくなる。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
