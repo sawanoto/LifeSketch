@@ -103,5 +103,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./015_bear-and-car/",
     description: "ふたつの影が通り過ぎる。その違いを、眺める。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 16,
+    title: "スポットライト / Spotlight",
+    url: "./016_spotlight/",
+    description: "暗闇の中で、光を動かす。",
+    tags: ["p5.js", "Interactive"]
   }
 ];

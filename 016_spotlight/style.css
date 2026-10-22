@@ -1,0 +1,7 @@
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: #050507; }
+#stage { position: fixed; inset: 0; touch-action: none; overscroll-behavior: none; }
+canvas { display: block; touch-action: none; }
+canvas:focus-visible { outline: 1px solid #777; outline-offset: -3px; }
+.back { position: fixed; top: max(22px, env(safe-area-inset-top)); left: max(24px, env(safe-area-inset-left)); color: #77777c; font: 11px/1.6 system-ui, sans-serif; text-decoration: none; letter-spacing: .12em; }
+.back span { color: #55555a; }
+.back:hover, .back:focus-visible { color: #ccc; }
