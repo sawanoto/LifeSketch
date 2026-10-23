@@ -1,0 +1,21 @@
+*{box-sizing:border-box}
+body{margin:0;background:#f5f2e9;color:#4c4942;font-family:Arial,'Noto Sans JP',sans-serif;min-height:100svh;display:flex;flex-direction:column}
+header,footer{padding:20px 4vw;font-size:11px;letter-spacing:.12em}
+a{color:inherit;text-decoration:none;font-weight:600}header span{color:#928c80;font-weight:400}
+main{width:min(100%,840px);margin:auto;flex:1;display:flex;flex-direction:column;justify-content:space-evenly;align-items:center;padding:0 16px;gap:16px}
+h1{font:400 clamp(22px,3vw,30px) serif;letter-spacing:.22em;margin:8px 0 12px}
+.choices{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));width:100%;gap:clamp(2px,2vw,24px)}
+button{border:0;background:transparent;color:inherit;font:inherit;display:flex;align-items:center;flex-direction:column;gap:10px;padding:12px 2px;border-radius:16px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-width:0}
+button span{font-size:12px;letter-spacing:.12em}button svg{width:clamp(38px,6vw,54px);height:clamp(38px,6vw,54px);transition:opacity .18s}
+button:disabled{cursor:default}button:disabled svg{opacity:0}button:disabled span{opacity:.4}
+@media(hover:hover){button:enabled:hover{background:#ece7dd}}
+:focus-visible{outline:2px solid #688d90;outline-offset:3px}
+.center{display:flex;flex-direction:column;align-items:center;width:100%;gap:20px}
+.bubble{position:relative;background:#fffdf7;border:1px solid #d6cfc1;border-radius:50%;padding:22px 28px;margin:0;font-family:serif;font-size:clamp(18px,3vw,23px);letter-spacing:.08em}
+.bubble:after{content:'';position:absolute;width:14px;height:14px;background:#fffdf7;border-right:1px solid #d6cfc1;border-bottom:1px solid #d6cfc1;bottom:-7px;left:48%;transform:rotate(45deg)}
+#stage{width:100%;height:clamp(145px,24svh,235px)}canvas{display:block}
+.offering{position:fixed;width:48px;height:48px;left:0;top:0;pointer-events:none;z-index:5;will-change:transform,opacity}.offering svg{width:100%;height:100%}
+footer{color:#928879;margin:16px 4vw 0;padding:16px 0;border-top:1px solid #ded8cb}
+@media(max-height:600px){main{gap:8px}h1{margin:0;font-size:20px}.center{gap:12px}.bubble{padding:14px 22px}#stage{height:115px}button{padding:5px 2px}header,footer{padding-top:10px;padding-bottom:10px}}
+@media(prefers-reduced-motion:reduce){button svg{transition:none}}
+@media(max-height:450px){header{padding:8px 4vw}footer{margin-top:6px;padding:8px 0}main{gap:6px}h1{font-size:18px}.choices button{padding:4px 2px;gap:6px}.choices svg{width:32px;height:32px}.choices span{font-size:11px}.center{gap:10px}.bubble{padding:10px 22px;font-size:17px}#stage{height:85px}}
