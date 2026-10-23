@@ -124,5 +124,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./016_emotional-snowball/",
     description: "つかんで、ころがす。少しずつ、大きくなる。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 19,
+    title: "剣を振り回すマーパン",
+    url: "./019_sword-spinning/",
+    description: "剣が回る。そばを通る。離れて過ごす。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
