@@ -15,12 +15,14 @@
 <p id="empty">好きな風景に、マーパンを。<br>写真を選んではじめる。</p>
 <canvas id="photo" hidden tabindex="0" aria-label="マーパンをドラッグで移動。矢印キーでも移動できます。"></canvas>
 </section>
-<p class="hint">ドラッグで移動 · 大きさと角度は下で調整</p>
+<p class="hint">タップで選ぶ · ドラッグで移動</p>
 <div class="buttons"><label class="button" for="file">写真を選ぶ</label><input id="file" type="file" accept="image/jpeg,image/png,image/webp"><label class="button" for="camera">カメラで撮る</label><input id="camera" type="file" accept="image/*" capture="environment"><button id="save" disabled>画像を保存</button></div>
 <fieldset id="controls" disabled>
+<button id="add" type="button">マーパンを追加</button><button id="remove" type="button">選んだマーパンを削除</button>
+<label for="selected">選択中</label><select id="selected" aria-label="編集するマーパン"></select>
 <label for="size">大きさ <output id="size-value">100%</output></label><input id="size" type="range" min="20" max="250" value="100">
 <label for="angle">角度 <output id="angle-value">0°</output></label><input id="angle" type="range" min="-180" max="180" value="0">
-<button id="reset" type="button">配置を戻す</button>
+<button id="reset" type="button">選んだ配置を戻す</button>
 </fieldset>
 <p id="status" role="status" aria-live="polite"></p>
 <p class="privacy">写真はこのブラウザの中だけで使います。</p>
