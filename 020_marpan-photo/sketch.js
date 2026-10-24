@@ -1,5 +1,5 @@
 /* Photo data, placement, shared character rendering and export stay independent. */
-const ui = Object.fromEntries(['photo','file','empty','size','angle','size-value','angle-value','save','controls','reset','status','result','result-image','download','share','close-result'].map(id => [id, document.getElementById(id)]));
+const ui = Object.fromEntries(['photo','file','camera','empty','size','angle','size-value','angle-value','save','controls','reset','status','result','result-image','download','share','close-result'].map(id => [id, document.getElementById(id)]));
 const placement = { x: 0.5, y: 0.5, scale: 1, angle: 0 };
 let photo = null, marpan, stickerCanvas, loadVersion = 0, resultURL = null, savedFile = null;
 let drag = null;
@@ -63,9 +63,9 @@ function updatePlacement() {
   preview();
 }
 
-ui.file.addEventListener('change', async () => {
-  const file = ui.file.files[0];
-  ui.file.value = '';
+async function loadPhoto(input) {
+  const file = input.files[0];
+  input.value = '';
   if (!file) return;
   const version = ++loadVersion;
   ui.status.textContent = '写真を読み込んでいます…';
@@ -89,17 +89,22 @@ ui.file.addEventListener('change', async () => {
   } catch {
     if (version === loadVersion) ui.status.textContent = '写真を開けませんでした。JPEG・PNG・WebPの画像を選んでください。';
   } finally { URL.revokeObjectURL(url); }
-});
+}
+for (const input of [ui.file, ui.camera]) input.addEventListener('change', () => loadPhoto(input));
 ui.size.addEventListener('input', updatePlacement);
 ui.angle.addEventListener('input', updatePlacement);
 ui.reset.addEventListener('click', resetPlacement);
-function point(event) {
+function photoPointerPosition(event) {
   const rect = ui.photo.getBoundingClientRect();
-  return { x: (event.clientX - rect.left) / rect.width, y: (event.clientY - rect.top) / rect.height };
+  if (!rect.width || !rect.height) return null;
+  const x = (event.clientX - rect.left) / rect.width;
+  const y = (event.clientY - rect.top) / rect.height;
+  return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
 }
 ui.photo.addEventListener('pointerdown', event => {
   if (!photo || drag || (event.pointerType === 'mouse' && event.button !== 0)) return;
-  const p = point(event);
+  const p = photoPointerPosition(event);
+  if (!p) return;
   const dx = (p.x - placement.x) * ui.photo.width, dy = (p.y - placement.y) * ui.photo.height;
   const angle = placement.angle * Math.PI / 180;
   const localX = dx * Math.cos(angle) + dy * Math.sin(angle);
@@ -113,7 +118,8 @@ ui.photo.addEventListener('pointerdown', event => {
 });
 ui.photo.addEventListener('pointermove', event => {
   if (!drag || event.pointerId !== drag.id) return;
-  const p = point(event);
+  const p = photoPointerPosition(event);
+  if (!p) return;
   placement.x = Math.max(0, Math.min(1, p.x - drag.x));
   placement.y = Math.max(0, Math.min(1, p.y - drag.y));
   preview();
@@ -135,6 +141,7 @@ ui.save.addEventListener('click', async () => {
   ui.save.disabled = true;
   ui.controls.disabled = true;
   ui.file.disabled = true;
+  ui.camera.disabled = true;
   ui.status.textContent = '保存用の画像を作っています…';
   try {
     const output = document.createElement('canvas');
@@ -159,6 +166,7 @@ ui.save.addEventListener('click', async () => {
     ui.save.disabled = false;
     ui.controls.disabled = false;
     ui.file.disabled = false;
+    ui.camera.disabled = false;
     preview(); // Release the large temporary sticker buffer after export.
   }
 });
