@@ -3,7 +3,8 @@ const ui = Object.fromEntries(['photo','file','camera','empty','size','angle','s
 const placements = [];
 let placement = null, nextMarpanId = 1;
 let photo = null, marpan, stickerCanvas, loadVersion = 0, resultURL = null, savedFile = null;
-let drag = null;
+const photoPointers = new Map();
+let photoGesture = null;
 let renderedStickerSide = 0;
 
 function setup() {
@@ -61,8 +62,11 @@ function syncSelection() {
     return option;
   }));
   for (const control of [ui.selected, ui.remove, ui.size, ui.angle, ui.reset]) control.disabled = !placement;
-  ui.size.value = placement ? placement.scale * 100 : 100;
-  ui.angle.value = placement ? placement.angle : 0;
+  syncTransformControls();
+}
+function syncTransformControls() {
+  ui.size.value = placement ? Math.round(placement.scale * 100) : 100;
+  ui.angle.value = placement ? Math.round(placement.angle) : 0;
   ui['size-value'].value = `${ui.size.value}%`;
   ui['angle-value'].value = `${ui.angle.value}°`;
 }
@@ -71,7 +75,7 @@ function addMarpan() {
   const offset = (placements.length % 5) * 0.04;
   placement = { id: nextMarpanId++, x: 0.5 + offset, y: 0.5 + offset, scale: 1, angle: 0 };
   placements.push(placement);
-  drag = null;
+  cancelPhotoGesture();
   syncSelection();
   clearResult();
   preview();
@@ -86,6 +90,7 @@ function clearResult() {
 }
 function resetPlacement() {
   if (!placement) return;
+  cancelPhotoGesture();
   Object.assign(placement, { x: 0.5, y: 0.5, scale: 1, angle: 0 });
   ui.size.value = 100;
   ui.angle.value = 0;
@@ -93,6 +98,7 @@ function resetPlacement() {
 }
 function updatePlacement() {
   if (!placement) return;
+  cancelPhotoGesture();
   placement.scale = Number(ui.size.value) / 100;
   placement.angle = Number(ui.angle.value);
   ui['size-value'].value = `${ui.size.value}%`;
@@ -114,7 +120,7 @@ async function loadPhoto(input) {
     await image.decode();
     if (version !== loadVersion) return;
     photo = image;
-    drag = null;
+    cancelPhotoGesture();
     const ratio = Math.min(1, 1400 / Math.max(image.naturalWidth, image.naturalHeight));
     ui.photo.width = Math.max(1, Math.round(image.naturalWidth * ratio));
     ui.photo.height = Math.max(1, Math.round(image.naturalHeight * ratio));
@@ -139,14 +145,14 @@ ui.remove.addEventListener('click', () => {
   if (!placement) return;
   placements.splice(placements.indexOf(placement), 1);
   placement = placements[placements.length - 1] || null;
-  drag = null;
+  cancelPhotoGesture();
   syncSelection();
   clearResult();
   preview();
 });
 ui.selected.addEventListener('change', () => {
   placement = placements.find(item => item.id === Number(ui.selected.value)) || null;
-  drag = null;
+  cancelPhotoGesture();
   syncSelection();
   preview();
 });
@@ -157,11 +163,38 @@ function photoPointerPosition(event) {
   const y = (event.clientY - rect.top) / rect.height;
   return Number.isFinite(x) && Number.isFinite(y) ? { x, y } : null;
 }
-ui.photo.addEventListener('pointerdown', event => {
-  if (!photo || ui.controls.disabled || drag || (event.pointerType === 'mouse' && event.button !== 0)) return;
-  const p = photoPointerPosition(event);
-  if (!p) return;
-  const hit = [...placements].reverse().find(item => {
+function cancelPhotoGesture() {
+  photoGesture = null;
+  const ids = [...photoPointers.keys()];
+  photoPointers.clear();
+  for (const id of ids) {
+    if (ui.photo.hasPointerCapture(id)) ui.photo.releasePointerCapture(id);
+  }
+}
+function gestureGeometry() {
+  const points = [...photoPointers.values()];
+  const first = points[0], second = points[1] || first;
+  const dx = (second.x - first.x) * ui.photo.width;
+  const dy = (second.y - first.y) * ui.photo.height;
+  return {
+    x: (first.x + second.x) / 2,
+    y: (first.y + second.y) / 2,
+    distance: Math.hypot(dx, dy),
+    angle: Math.atan2(dy, dx)
+  };
+}
+// Rebase whenever a finger is added/lifted so switching between one and two
+// fingers never jumps. All movement is relative to the gesture's start.
+function beginPhotoGesture() {
+  photoGesture = photoPointers.size && placement ? {
+    item: placement,
+    start: { ...placement },
+    geometry: gestureGeometry(),
+    count: photoPointers.size
+  } : null;
+}
+function hitMarpan(p) {
+  return [...placements].reverse().find(item => {
     const dx = (p.x - item.x) * ui.photo.width, dy = (p.y - item.y) * ui.photo.height;
     const angle = item.angle * Math.PI / 180;
     const localX = dx * Math.cos(angle) + dy * Math.sin(angle);
@@ -169,24 +202,49 @@ ui.photo.addEventListener('pointerdown', event => {
     const bodyWidth = Math.min(ui.photo.width, ui.photo.height) * 0.35 * item.scale;
     return Math.abs(localX) <= bodyWidth * 0.55 && Math.abs(localY) <= bodyWidth * 0.39;
   });
-  if (!hit) return;
-  placement = hit;
-  syncSelection();
-  preview();
-  event.preventDefault();
-  ui.photo.setPointerCapture(event.pointerId);
-  drag = { id: event.pointerId, x: p.x - placement.x, y: p.y - placement.y };
-  clearResult();
-});
-ui.photo.addEventListener('pointermove', event => {
-  if (!drag || event.pointerId !== drag.id) return;
+}
+ui.photo.addEventListener('pointerdown', event => {
+  if (!photo || ui.controls.disabled || photoPointers.size >= 2 || (event.pointerType === 'mouse' && event.button !== 0)) return;
   const p = photoPointerPosition(event);
   if (!p) return;
-  placement.x = Math.max(0, Math.min(1, p.x - drag.x));
-  placement.y = Math.max(0, Math.min(1, p.y - drag.y));
+  // Only the first finger chooses a character; a second finger always edits
+  // the same selection even if it lands on another Marpan.
+  if (!photoPointers.size) {
+    placement = hitMarpan(p) || placement;
+    syncSelection();
+  }
+  if (!placement) return;
+  event.preventDefault();
+  ui.photo.setPointerCapture(event.pointerId);
+  photoPointers.set(event.pointerId, p);
+  beginPhotoGesture();
+  clearResult();
   preview();
 });
-for (const type of ['pointerup','pointercancel','lostpointercapture']) ui.photo.addEventListener(type, event => { if (drag?.id === event.pointerId) drag = null; });
+ui.photo.addEventListener('pointermove', event => {
+  if (!photoGesture || !photoPointers.has(event.pointerId)) return;
+  if (ui.controls.disabled) { cancelPhotoGesture(); return; }
+  const p = photoPointerPosition(event);
+  if (!p) return;
+  event.preventDefault();
+  photoPointers.set(event.pointerId, p);
+  const current = gestureGeometry();
+  const { item, start, geometry, count } = photoGesture;
+  item.x = Math.max(0, Math.min(1, start.x + current.x - geometry.x));
+  item.y = Math.max(0, Math.min(1, start.y + current.y - geometry.y));
+  if (count === 2 && geometry.distance > 0.001 && current.distance > 0.001) {
+    item.scale = Math.max(0.2, Math.min(2.5, start.scale * current.distance / geometry.distance));
+    const delta = Math.atan2(Math.sin(current.angle - geometry.angle), Math.cos(current.angle - geometry.angle));
+    item.angle = ((start.angle + delta * 180 / Math.PI + 180) % 360 + 360) % 360 - 180;
+  }
+  syncTransformControls();
+  preview();
+});
+for (const type of ['pointerup','pointercancel','lostpointercapture']) ui.photo.addEventListener(type, event => {
+  if (!photoPointers.delete(event.pointerId)) return;
+  if (ui.photo.hasPointerCapture(event.pointerId)) ui.photo.releasePointerCapture(event.pointerId);
+  beginPhotoGesture();
+});
 ui.photo.addEventListener('keydown', event => {
   const directions = { ArrowLeft: [-1,0], ArrowRight: [1,0], ArrowUp: [0,-1], ArrowDown: [0,1] };
   if (!photo || !placement || ui.controls.disabled || !directions[event.key]) return;
@@ -200,6 +258,7 @@ ui.photo.addEventListener('keydown', event => {
 
 ui.save.addEventListener('click', async () => {
   if (!photo) return;
+  cancelPhotoGesture();
   ui.save.disabled = true;
   ui.controls.disabled = true;
   ui.file.disabled = true;

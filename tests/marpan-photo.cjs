@@ -29,6 +29,54 @@ const { chromium } = require('playwright');
  const [download]=await Promise.all([page.waitForEvent('download'),page.locator('#download').click()]);if(download.suggestedFilename()!=='lifesketch-marpan.png')throw Error('download');
  await page.locator('#close-result').click();await page.locator('#reset').click();
  }
+ // Drag from empty photo space without snapping the selected sticker to the finger.
+ await page.locator('#photo').scrollIntoViewIfNeeded();
+ const gestureBox = await page.locator('#photo').boundingBox();
+ const at = (x,y) => ({x:gestureBox.x+gestureBox.width*x,y:gestureBox.y+gestureBox.height*y});
+ const beforeRemote=await page.evaluate(()=>({...placement}));
+ if(mobile) {
+   const cdp=await page.context().newCDPSession(page);
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[at(.1,.15)]});
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[at(.2,.25)]});
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+   await cdp.detach();
+ } else {
+   await page.mouse.move(at(.1,.15).x,at(.1,.15).y);await page.mouse.down();
+   await page.mouse.move(at(.2,.25).x,at(.2,.25).y);await page.mouse.up();
+ }
+ const afterRemote=await page.evaluate(()=>({...placement}));
+ if(Math.abs(afterRemote.x-beforeRemote.x-.1)>.01 || Math.abs(afterRemote.y-beforeRemote.y-.1)>.01)throw Error('remote drag failed');
+ await page.locator('#reset').click();
+ if(mobile) {
+   await page.locator('#photo').scrollIntoViewIfNeeded();
+   const box=await page.locator('#photo').boundingBox();
+   const center={x:box.x+box.width*.25,y:box.y+box.height*.3};
+   const pair=(radius,angle)=>[-1,1].map((sign,index)=>({id:index+1,x:center.x+sign*radius*Math.cos(angle),y:center.y+sign*radius*Math.sin(angle)}));
+   const cdp=await page.context().newCDPSession(page);
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:pair(20,0)});
+   const baseline=await page.evaluate(()=>({...placement}));
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:pair(30,Math.PI/4)});
+   await page.waitForFunction(() => Math.abs(placement.scale-1.5)<.03);
+   const enlarged=await page.evaluate(()=>({...placement}));
+   if(Math.abs(enlarged.scale-1.5)>.03 || Math.abs(enlarged.angle-45)>1)throw Error('pinch out/rotate failed '+JSON.stringify(enlarged));
+   if(Math.abs(enlarged.x-baseline.x)>.01 || Math.abs(enlarged.y-baseline.y)>.01)throw Error('pinch jumps position');
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:pair(12,-Math.PI/6)});
+   await page.waitForFunction(() => Math.abs(placement.scale-.6)<.03);
+   const reduced=await page.evaluate(()=>({...placement}));
+   if(Math.abs(reduced.scale-.6)>.03 || Math.abs(reduced.angle+30)>1)throw Error('pinch in/reverse rotation failed '+JSON.stringify(reduced));
+   const remaining=pair(12,-Math.PI/6)[0];
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[pair(12,-Math.PI/6)[1]]});
+   const lifted=await page.evaluate(()=>({...placement}));
+   if(Math.abs(lifted.x-reduced.x)>.01 || Math.abs(lifted.y-reduced.y)>.01)throw Error('finger lift jumps position');
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{id:remaining.id,x:remaining.x+10,y:remaining.y+10}]});
+   await page.waitForFunction(x => placement.x > x+.01, lifted.x);
+   const resumed=await page.evaluate(()=>({...placement}));
+   if(Math.abs(resumed.x-lifted.x-10/box.width)>.01 || Math.abs(resumed.y-lifted.y-10/box.height)>.01)throw Error('one-finger continuation jumps');
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+   if(await page.evaluate(()=>photoPointers.size)!==0)throw Error('cancel left stale pointers');
+   await cdp.detach();
+   await page.locator('#reset').click();
+ }
  // Multiple stickers keep independent transforms and all appear in the export.
  await page.locator('#photo').focus();
  await page.keyboard.press('ArrowLeft');
@@ -54,6 +102,15 @@ const { chromium } = require('playwright');
  if(mobile) await page.touchscreen.tap(selectionBox.x+selectionBox.width*target.x,selectionBox.y+selectionBox.height*target.y);
  else await page.mouse.click(selectionBox.x+selectionBox.width*target.x,selectionBox.y+selectionBox.height*target.y);
  if(await page.evaluate(() => placement.id)!==target.id) throw Error('tap did not select another sticker');
+ if(mobile) {
+   const cdp=await page.context().newCDPSession(page);
+   const touches=items.map((item,index)=>({id:index+1,x:selectionBox.x+selectionBox.width*item.x,y:selectionBox.y+selectionBox.height*item.y}));
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:touches});
+   if(await page.evaluate(()=>placement.id)!==target.id) throw Error('second finger changed selection');
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+   await cdp.detach();
+ }
+
  await page.locator('#save').click();
  await page.locator('#result-image').waitFor({state:'visible'});
  await page.locator('#result-image').evaluate(img => img.decode());
@@ -79,7 +136,7 @@ const { chromium } = require('playwright');
  if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('horizontal overflow');
 
  if(errors.length)throw Error(errors.join('\n'));
- console.log(mobile?'Mobile touch: PASS':'Desktop mouse: PASS','JPEG/PNG/WebP, portrait/landscape, drag, sliders, original-resolution export, download, reset, multiple selection, independent transforms, multi-sticker export, remove, 26 stickers, invalid file, no page errors');await page.close();
+ console.log(mobile?'Mobile touch: PASS':'Desktop mouse: PASS','JPEG/PNG/WebP, portrait/landscape, drag, sliders, original-resolution export, download, reset, remote drag, pinch scale/rotation/translation, finger transitions, multiple selection, independent transforms, multi-sticker export, remove, 26 stickers, invalid file, no page errors');await page.close();
  }
  await browser.close();
 })().catch(error => { console.error(error); process.exit(1); });
