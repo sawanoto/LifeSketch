@@ -131,5 +131,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./019_sword-spinning/",
     description: "剣が回る。そばを通る。離れて過ごす。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 20,
+    title: "マーパンと記念撮影",
+    url: "./020_marpan-photo/",
+    description: "好きな風景に、マーパンを。写真に置いて、記念の一枚を保存する。",
+    tags: ["p5.js", "Interactive", "Photo"]
   }
 ];
