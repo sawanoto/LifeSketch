@@ -131,5 +131,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./019_sword-spinning/",
     description: "剣が回る。そばを通る。離れて過ごす。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 20,
+    title: "マーパンノート",
+    url: "./020_marpan-notebook/",
+    description: "歩いたり、喜んだり、ひと休み。20体のマーパンを、一冊の表紙に。",
+    tags: ["p5.js", "Illustration", "PNG"]
   }
 ];
