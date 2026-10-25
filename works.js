@@ -131,5 +131,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./019_sword-spinning/",
     description: "剣が回る。そばを通る。離れて過ごす。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 20,
+    title: "石を投げれば誰かに当たる",
+    url: "./020_stone-in-the-crowd/",
+    description: "奥まで続く、三つの目の群衆。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
