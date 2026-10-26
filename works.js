@@ -131,5 +131,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./019_sword-spinning/",
     description: "剣が回る。そばを通る。離れて過ごす。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 21,
+    title: "テレビスカッシュ",
+    url: "./021_tv-squash/",
+    description: "テレビに向かって、ボールを投げる。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
