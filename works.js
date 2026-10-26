@@ -134,6 +134,13 @@ window.LIFE_SKETCH_WORKS = [
   },
   {
     number: 20,
+    title: "マーパンノート",
+    url: "./020_marpan-notebook/",
+    description: "歩いたり、喜んだり、ひと休み。20体のマーパンを、一冊の表紙に。",
+    tags: ["p5.js", "Illustration", "PNG"]
+  },
+  {
+    number: 21,
     title: "石を投げれば誰かに当たる",
     url: "./020_stone-in-the-crowd/",
     description: "奥まで続く、三つの目の群衆。",

@@ -91,3 +91,7 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 ## LifeSketch 018 · 感情の雪だるま
 
 `016_emotional-snowball/`。笑顔・無表情・泣き顔をつかんで転がすと、それぞれが少しずつ大きくなります。全体の回転、自由な重なり、前面への選択、リセット、マウス・タッチに対応。[操作と実装](016_emotional-snowball/README.md)。
+
+## LifeSketch 020 · マーパンノート
+
+[ノート表紙](020_marpan-notebook/)と[ポーズ・表情一覧](020_marpan-notebook/poses.html)。緑色の表紙に20体を配置し、2500×3535px PNGを保存できます。既存の三つ目・輪郭を保ち、5つの静止ポーズと5表情を独立ライブラリ `shared/marpan-poses.js` で指定します。[調査結果・他作品からの利用・拡張方法](020_marpan-notebook/README.md)。ギャラリーの「マーパンノート」から開けます。
