@@ -145,5 +145,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./020_stone-in-the-crowd/",
     description: "奥まで続く、三つの目の群衆。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 22,
+    title: "テレビスカッシュ",
+    url: "./021_tv-squash/",
+    description: "テレビに向かって、ボールを投げる。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
