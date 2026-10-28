@@ -12,7 +12,7 @@ function windowResized(){resizeCanvas(windowWidth,Math.max(500,windowHeight));}
 function showResult(){const [a,b]=race.cars,f=c=>(K.tank-c.fuel).toFixed(1),t=c=>c.arrival===null?'到着不能':`${c.arrival.toFixed(2)} 秒`;const box=document.querySelector('#result');box.innerHTML=`<h1>到着</h1><table><tr><th></th><th>上の車</th><th>下の車</th></tr><tr><th>時間</th><td>${t(a)}</td><td>${t(b)}</td></tr><tr><th>消費燃料</th><td>${f(a)}</td><td>${f(b)}</td></tr><tr><th></th><td><meter min="0" max="100" value="${f(a)}"></meter></td><td><meter min="0" max="100" value="${f(b)}"></meter></td></tr></table><p>時間差：${a.arrival===null?'—（上の車はガス欠）':`${Math.abs(a.arrival-b.arrival).toFixed(2)} 秒（${a.arrival===b.arrival?'同着':a.arrival<b.arrival?'上の車が先':'下の車が先'}）`}<br>消費燃料の差（上 − 下）：${(b.fuel-a.fuel).toFixed(1)}</p><button id="again">もう一度</button>`;box.hidden=false;document.querySelector('#again').onclick=resetRace;}
 function draw(){advance(performance.now());background('#f5f2e9');const roadY=height*.48,u=Math.min(width/760,1.3),lane=85*Math.max(.65,u);const [a,b]=race.cars;
  // One affine world-to-screen mapping for both lanes, signals and finish.
- const span=Math.max(220,Math.abs(a.x-b.x)+110),scaleX=(width-90)/span,cam=Math.min(a.x,b.x)-45,wx=x=>45+(x-cam)*scaleX;
+ const span=Math.max(220,Math.abs(a.x-b.x)+110),scaleX=(width-90)/span,cam=Math.min((a.x+b.x)*.5-80,Math.min(a.x,b.x)-25),wx=x=>45+(x-cam)*scaleX;
  noStroke();fill('#e9e6dc');rect(0,roadY-35,width,lane+75,4);
  stroke('#c7c5b9');strokeWeight(1);for(let x=Math.floor(cam/20)*20;x<cam+span+40;x+=20)line(wx(x),roadY+lane*.5,wx(x+8),roadY+lane*.5);
  for(let n=Math.floor(cam/55);n<(cam+span)/55+1;n++){const x=wx(n*55);noStroke();fill('#dce0d1');ellipse(x,roadY-85,24,32);stroke('#b5b6a4');line(x,roadY-71,x,roadY-47);}
