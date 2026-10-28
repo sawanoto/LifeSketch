@@ -9,7 +9,7 @@ assert(cases[2].s.cars[0].fuel<cases[0].s.cars[0].fuel);
 for(const r of cases){assert.equal(r.s.cars[1].arrival,cases[0].s.cars[1].arrival);}
 console.table(cases.map(r=>({taps:r.hz,until:r.stopAt,upper:r.s.cars[0].arrival?.toFixed(2)||'empty',lower:r.s.cars[1].arrival.toFixed(2),upperFuel:(100-r.s.cars[0].fuel).toFixed(2),lowerFuel:(100-r.s.cars[1].fuel).toFixed(2),redStops:r.s.cars[0].stops.join(','),catchUps:r.catches.join(',')})));
 // A stopped engine can burn fuel but cannot move through a red light.
-const idle=S.create();while(idle.time<18)S.step(idle);const car=idle.cars[0];assert(car.waiting);const x=car.x,fuel=car.fuel;for(let j=0;j<120;j++){if(j%10===0)S.tap(idle);S.step(idle);}assert.equal(car.x,x);assert(car.fuel<fuel);
+const idle=S.create();while(!idle.cars[0].waiting&&idle.time<21)S.step(idle);const car=idle.cars[0];assert(car.waiting);const x=car.x,fuel=car.fuel;for(let j=0;j<120;j++){if(j%10===0)S.tap(idle);S.step(idle);}assert.equal(car.x,x);assert(car.fuel<fuel);
 // Yellow: commit only when braking safely is no longer possible.
 for(const [distance,speed,go] of [[5,20,true],[80,12,false]]){const s=S.create();s.time=6.1;s.cars[0].x=200-distance;s.cars[0].v=speed;S.step(s);assert.equal(s.cars[0].yellowGo,go);}
 // Identical timestamped inputs with 30/60/120 Hz rendering drive the same fixed steps.
