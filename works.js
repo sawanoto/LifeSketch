@@ -152,5 +152,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./021_tv-squash/",
     description: "テレビに向かって、ボールを投げる。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 23,
+    title: "急ぐ車",
+    url: "./023_hurrying-cars/",
+    description: "ふたつの車、みっつの信号。タップして、走る。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];

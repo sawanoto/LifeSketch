@@ -1,0 +1,26 @@
+/* global RushSimulation, Marpan25D */
+'use strict';
+const S=RushSimulation,K=S.CONFIG;
+let race=S.create(),started=false,last=0,accumulator=0,drivers=[],engine,soundOn=false,audioReady=false;
+function resetRace(){race=S.create();started=false;accumulator=0;last=performance.now();document.querySelector('#result').hidden=true;document.querySelector('#hint').hidden=false;}
+async function unlockAudio(){try{await userStartAudio();if(!engine){engine=new p5.Oscillator('sawtooth');engine.start();engine.amp(0);}audioReady=true;}catch(e){audioReady=false;}}
+function input(){if(race.done)return;advance(performance.now());started=true;document.querySelector('#hint').hidden=true;S.tap(race);if(soundOn)unlockAudio();}
+function setup(){const c=createCanvas(windowWidth,Math.max(500,windowHeight));c.parent('stage');pixelDensity(Math.min(2,devicePixelRatio||1));drivers=[new Marpan25D({bodyColor:'#fffdf6',autoBlink:false}),new Marpan25D({bodyColor:'#fffdf6',autoBlink:false})];last=performance.now();c.elt.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();input();});document.querySelector('#reset').onclick=resetRace;document.querySelector('#sound').onclick=async()=>{soundOn=!soundOn;document.querySelector('#sound').textContent=`音 ${soundOn?'ON':'OFF'}`;document.querySelector('#sound').setAttribute('aria-pressed',String(soundOn));if(soundOn)await unlockAudio();};document.addEventListener('visibilitychange',()=>{last=performance.now();accumulator=0;});}
+function keyPressed(e){if(e.code==='Space'&&e.target===document.body){e.preventDefault();if(!e.repeat)input();}}
+function advance(now){const dt=(now-last)/1000;last=now;if(!started||document.hidden||race.done)return;accumulator+=Math.min(dt,0.25);while(accumulator>=K.step&&!race.done){S.step(race);accumulator-=K.step;}if(race.done)showResult();}
+function windowResized(){resizeCanvas(windowWidth,Math.max(500,windowHeight));}
+function showResult(){const [a,b]=race.cars,f=c=>(K.tank-c.fuel).toFixed(1),t=c=>c.arrival===null?'到着不能':`${c.arrival.toFixed(2)} 秒`;const box=document.querySelector('#result');box.innerHTML=`<h1>到着</h1><table><tr><th></th><th>上の車</th><th>下の車</th></tr><tr><th>時間</th><td>${t(a)}</td><td>${t(b)}</td></tr><tr><th>消費燃料</th><td>${f(a)}</td><td>${f(b)}</td></tr><tr><th></th><td><meter min="0" max="100" value="${f(a)}"></meter></td><td><meter min="0" max="100" value="${f(b)}"></meter></td></tr></table><p>時間差：${a.arrival===null?'—（上の車はガス欠）':`${Math.abs(a.arrival-b.arrival).toFixed(2)} 秒（${a.arrival===b.arrival?'同着':a.arrival<b.arrival?'上の車が先':'下の車が先'}）`}<br>消費燃料の差（上 − 下）：${(b.fuel-a.fuel).toFixed(1)}</p><button id="again">もう一度</button>`;box.hidden=false;document.querySelector('#again').onclick=resetRace;}
+function draw(){advance(performance.now());background('#f5f2e9');const roadY=height*.48,u=Math.min(width/760,1.3),lane=85*Math.max(.65,u);const [a,b]=race.cars;
+ // One affine world-to-screen mapping for both lanes, signals and finish.
+ const span=Math.max(220,Math.abs(a.x-b.x)+110),scaleX=(width-90)/span,cam=Math.min(a.x,b.x)-45,wx=x=>45+(x-cam)*scaleX;
+ noStroke();fill('#e9e6dc');rect(0,roadY-35,width,lane+75,4);
+ stroke('#c7c5b9');strokeWeight(1);for(let x=Math.floor(cam/20)*20;x<cam+span+40;x+=20)line(wx(x),roadY+lane*.5,wx(x+8),roadY+lane*.5);
+ for(let n=Math.floor(cam/55);n<(cam+span)/55+1;n++){const x=wx(n*55);noStroke();fill('#dce0d1');ellipse(x,roadY-85,24,32);stroke('#b5b6a4');line(x,roadY-71,x,roadY-47);}
+ K.signals.forEach((signal,i)=>{const x=wx(signal.x),color=S.light(i,race.time);if(x< -40||x>width+40)return;stroke('#aaa99b');line(x,roadY-24,x,roadY+lane+27);noStroke();fill('#777d73');rect(x-22,roadY-65,44,20,6);['green','yellow','red'].forEach((col,j)=>{fill(color===col?['#6f9a7a','#ddba60','#c56952'][j]:'#93968a');circle(x-13+j*13,roadY-55,8);});stroke('#faf8ed');strokeWeight(3);line(x,roadY-24,x,roadY+lane+24);});
+ const finish=wx(K.distance);if(finish<width+25){stroke('#a8ac9e');strokeWeight(2);line(finish,roadY-30,finish,roadY+lane+30);noStroke();fill('#939789');textSize(10);textAlign(CENTER);text('GOAL',finish,roadY-45);}
+ race.cars.forEach((c,i)=>{const y=roadY+i*lane,x=wx(c.x)-18;push();translate(x,y);scale(Math.max(.65,u));if(i===0&&c.waiting&&c.boost>0)translate(Math.sin(race.time*95)*c.boost*1.7,0);
+ if(i===0&&c.v>16){stroke('#c8b6a0');strokeWeight(1);for(let j=0;j<3;j++)line(-48-j*6,-8+j*8,-30,-8+j*8);}
+ noStroke();fill('#ded9cb');ellipse(0,20,65,8);drivers[i].drawAt(-2,-14,{bodyWidth:27,bodyHeight:20,pulse:0,yaw:.5,lookX:x+100,lookY:y});fill(i===0?'#bd795e':'#8b9c8b');rect(-30,-10,60,24,7);fill('#687168');circle(-18,14,12);circle(19,14,12);fill('#dbd6c7');circle(-18,14,5);circle(19,14,5);pop();});
+ textAlign(LEFT);textSize(11);race.cars.forEach((c,i)=>{const y=roadY+lane+68+i*30;noStroke();fill(i===0?'#ad7057':'#7f927e');text(i===0?'上':'下',24,y+4);fill('#dfdbce');rect(48,y-5,width-130,7,4);fill(i===0?'#bd795e':'#8b9c8b');rect(48,y-5,(width-130)*c.fuel/K.tank,7,4);fill('#827b6e');text(`${c.fuel.toFixed(1)}`,width-64,y+3);});
+ if(engine&&audioReady){const active=soundOn&&started&&!race.done&&!a.empty&&!document.hidden&&a.arrival===null;engine.freq(42+a.v*2+a.boost*65,.04);engine.amp(active?Math.min(.045,.008+a.boost*.035):0,.06);}
+}
