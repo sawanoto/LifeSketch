@@ -152,5 +152,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./021_tv-squash/",
     description: "テレビに向かって、ボールを投げる。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 23,
+    title: "売り手と買い手",
+    url: "./023_sellers-and-buyers/",
+    description: "ひとつ買う。歩く。また、お店がある。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
