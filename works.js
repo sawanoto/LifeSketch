@@ -152,5 +152,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./021_tv-squash/",
     description: "テレビに向かって、ボールを投げる。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 23,
+    title: "あおり運転",
+    url: "./023_tailgating/",
+    description: "一台に触れる。その先を、眺める。",
+    tags: ["Canvas", "Interactive"]
   }
 ];
