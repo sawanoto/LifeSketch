@@ -8,13 +8,13 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header><a href="../">LIFESketch / 023</a><button id="reset" type="button">はじめから</button></header>
+<header><a href="../">LIFESketch / 023</a><div class="controls"><button id="language" type="button">English</button><button id="reset" type="button">はじめから</button></div></header>
 <main>
 <h1>売り手と買い手</h1>
 <div id="stage" aria-label="手仕事市を歩くマーパン">
-<button id="buy" type="button"><span>タップして購入</span></button>
+<button id="buy" type="button"></button>
 </div>
-<p id="status" role="status" aria-live="polite">お店に触れる</p>
+<p id="status" role="status" aria-live="polite">タップすると、上のお店からバスケットへ</p>
 </main>
 <script src="../002_jomon-room/p5.min.js"></script>
 <script src="../shared/marpan-25d.js"></script>
