@@ -159,5 +159,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./023_sellers-and-buyers/",
     description: "ひとつ買う。歩く。また、お店がある。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 24,
+    title: "会話の地雷原",
+    url: "./024_conversation-minefield/",
+    description: "声を鳴らす。あちこちで、はじける。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
