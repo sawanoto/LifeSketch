@@ -112,7 +112,7 @@ function draw() {
   noStroke(); fill('#1c2d2c');
   beginShape();vertex(0,ground-14);bezierVertex(width*.2,ground-24,width*.3,ground+5,width*.53,ground-8);bezierVertex(width*.7,ground-20,width*.85,ground-7,width,ground-17);vertex(width,height);vertex(0,height);endShape(CLOSE);
   fill(0,0,0,40); ellipse(x,ground+3,size*1.04,size*.12);
-  const mw = Math.min(width*.24,145,height*.23), mx=x+size*.57+mw*.52, my=ground-mw*.38;
+  const mw = Math.min(width*.24,145,height*.23), mx=Math.min(width-mw*.58-12,x+size*.57+mw*.52), my=ground-mw*.38;
   fill(0,0,0,35);ellipse(mx,ground+4,mw*1.1,mw*.12);
   marpan.drawAt(mx,my,{bodyWidth:mw,bodyHeight:mw*.72,yaw:0,lookX:mx,lookY:my,pulse:0});
   const age=clock-lastHit;
