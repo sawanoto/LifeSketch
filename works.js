@@ -159,5 +159,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./023_sellers-and-buyers/",
     description: "ひとつ買う。歩く。また、お店がある。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 24,
+    title: "ゾンビ清掃婦",
+    url: "./024_zombie-cleaner/",
+    description: "鳩小屋をクリックすると、鳩が飛び立ちます。空にはマーパンのアドバルーンが浮かんでいます。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
