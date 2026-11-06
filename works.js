@@ -159,5 +159,13 @@ window.LIFE_SKETCH_WORKS = [
     url: "./023_sellers-and-buyers/",
     description: "ひとつ買う。歩く。また、お店がある。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 24,
+    title: "銅鐸",
+    url: "./024_dotaku/",
+    description: "銅鐸にふれる。音が響き、空が揺らめく。",
+    thumbnail: "./024_dotaku/thumbnail.png",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
