@@ -159,5 +159,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./023_sellers-and-buyers/",
     description: "ひとつ買う。歩く。また、お店がある。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 24,
+    title: "恋は盲目",
+    url: "./024_love-is-blind/",
+    description: "恋をすると、世界が狭くなる。世界は何も変わっていないのに。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
