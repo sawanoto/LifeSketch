@@ -159,5 +159,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./023_sellers-and-buyers/",
     description: "ひとつ買う。歩く。また、お店がある。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 24,
+    title: "時間の天秤",
+    url: "./024_time-balance/",
+    description: "分銅を置く。均衡が変わる。時間は流れ続ける。",
+    tags: ["Canvas 2D", "Interactive"]
   }
 ];
