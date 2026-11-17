@@ -134,6 +134,48 @@ window.LIFE_SKETCH_WORKS = [
   },
   {
     number: 20,
+    title: "マーパンノート",
+    url: "./020_marpan-notebook/",
+    description: "歩いたり、喜んだり、ひと休み。20体のマーパンを、一冊の表紙に。",
+    tags: ["p5.js", "Illustration", "PNG"]
+  },
+  {
+    number: 21,
+    title: "石を投げれば誰かに当たる",
+    url: "./020_stone-in-the-crowd/",
+    description: "奥まで続く、三つの目の群衆。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 22,
+    title: "テレビスカッシュ",
+    url: "./021_tv-squash/",
+    description: "テレビに向かって、ボールを投げる。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 23,
+    title: "売り手と買い手",
+    url: "./023_sellers-and-buyers/",
+    description: "ひとつ買う。歩く。また、お店がある。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 24,
+    title: "会話の地雷原",
+    url: "./024_conversation-minefield/",
+    description: "声を鳴らす。あちこちで、はじける。",
+    tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 25,
+    title: "何か欲しい",
+    url: "./019_something-wanted/",
+    description: "何かを、ひとつ。もうひとつ。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 26,
     title: "マーパンと記念撮影",
     url: "./020_marpan-photo/",
     description: "好きな風景に、マーパンを。写真に置いて、記念の一枚を保存する。",

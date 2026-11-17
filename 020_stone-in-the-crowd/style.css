@@ -1,0 +1,2 @@
+*{box-sizing:border-box}html,body{margin:0;overflow:hidden;background:#f5f2e9;color:#716b60;font-family:Arial,sans-serif}#stage{width:100%;height:100svh}canvas{display:block;touch-action:none;-webkit-tap-highlight-color:transparent}.home{position:fixed;top:max(22px,env(safe-area-inset-top));left:max(24px,env(safe-area-inset-left));font-size:11px;letter-spacing:.12em;text-decoration:none;color:inherit}.home span{color:#a29a8d}a:focus-visible{outline:2px solid #527d89;outline-offset:6px}
+.home{padding:8px 10px;background:rgba(245,242,233,.92);border-radius:2px}
