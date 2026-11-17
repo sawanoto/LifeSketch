@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: #f6f5ef; color: #526264; font-family: system-ui, sans-serif; }
+header { max-width: 1200px; margin: auto; padding: 20px 24px; display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+a { color: inherit; text-decoration: none; font-size: 12px; letter-spacing: .1em; }
+h1 { font-size: 15px; font-weight: 400; margin: 0; }
+main { max-width: 1200px; margin: auto; }
+#stage { position: relative; width: 100%; height: min(76svh, 800px); min-height: 380px; overflow: hidden; background: #e9f3f4; }
+canvas { display: block; }
+#loft { position: absolute; z-index: 1; left: 2%; bottom: 5%; width: clamp(64px, 9%, 100px); padding: 0; border: 0; background: transparent; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+#loft svg { display: block; width: 100%; }
+#loft:focus-visible { outline: 2px solid #526264; outline-offset: 4px; border-radius: 4px; }
+p { margin: 16px 24px; font-size: 11px; letter-spacing: .04em; }
+@media (max-width: 600px) { header { padding: 18px 16px; } #stage { height: 78svh; } p { margin: 14px 16px; } }
