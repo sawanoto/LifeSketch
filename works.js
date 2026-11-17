@@ -166,5 +166,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./024_conversation-minefield/",
     description: "声を鳴らす。あちこちで、はじける。",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 25,
+    title: "何か欲しい",
+    url: "./019_something-wanted/",
+    description: "何かを、ひとつ。もうひとつ。",
+    tags: ["p5.js", "Interactive"]
   }
 ];

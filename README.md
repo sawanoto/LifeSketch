@@ -95,3 +95,7 @@ PRを更新すると、専用リポジトリのGitHub Actionsが約5分間隔で
 ## LifeSketch 020 · マーパンノート
 
 [ノート表紙](020_marpan-notebook/)と[ポーズ・表情一覧](020_marpan-notebook/poses.html)。緑色の表紙に20体を配置し、2500×3535px PNGを保存できます。既存の三つ目・輪郭を保ち、5つの静止ポーズと5表情を独立ライブラリ `shared/marpan-poses.js` で指定します。[調査結果・他作品からの利用・拡張方法](020_marpan-notebook/README.md)。ギャラリーの「マーパンノート」から開けます。
+
+## LifeSketch 025 · 何か欲しい
+
+`019_something-wanted/`。何かを、ひとつ。もうひとつ。物と感情をクリック・タップして与える作品。共通マーパン、吸収アニメーション、キーボード操作に対応。[操作と実装](019_something-wanted/README.md)。
