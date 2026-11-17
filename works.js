@@ -208,5 +208,13 @@ window.LIFE_SKETCH_WORKS = [
     url: "./024_zombie-cleaner/",
     description: "鳩小屋をクリックすると、鳩が飛び立ちます。空にはマーパンのアドバルーンが浮かんでいます。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 31,
+    title: "銅鐸",
+    url: "./024_dotaku/",
+    description: "銅鐸にふれる。音が響き、空が揺らめく。",
+    thumbnail: "./024_dotaku/thumbnail.png",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
