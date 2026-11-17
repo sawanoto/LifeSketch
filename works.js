@@ -173,5 +173,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./019_something-wanted/",
     description: "何かを、ひとつ。もうひとつ。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 26,
+    title: "マーパンと記念撮影",
+    url: "./020_marpan-photo/",
+    description: "好きな風景に、マーパンを。写真に置いて、記念の一枚を保存する。",
+    tags: ["p5.js", "Interactive", "Photo"]
   }
 ];
