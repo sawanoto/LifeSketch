@@ -216,5 +216,12 @@ window.LIFE_SKETCH_WORKS = [
     description: "銅鐸にふれる。音が響き、空が揺らめく。",
     thumbnail: "./024_dotaku/thumbnail.png",
     tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 32,
+    title: "時間の天秤",
+    url: "./024_time-balance/",
+    description: "分銅を置く。均衡が変わる。時間は流れ続ける。",
+    tags: ["Canvas 2D", "Interactive"]
   }
 ];
