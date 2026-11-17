@@ -162,6 +162,48 @@ window.LIFE_SKETCH_WORKS = [
   },
   {
     number: 24,
+    title: "会話の地雷原",
+    url: "./024_conversation-minefield/",
+    description: "声を鳴らす。あちこちで、はじける。",
+    tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 25,
+    title: "何か欲しい",
+    url: "./019_something-wanted/",
+    description: "何かを、ひとつ。もうひとつ。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 26,
+    title: "マーパンと記念撮影",
+    url: "./020_marpan-photo/",
+    description: "好きな風景に、マーパンを。写真に置いて、記念の一枚を保存する。",
+    tags: ["p5.js", "Interactive", "Photo"]
+  },
+  {
+    number: 27,
+    title: "急ぐ車",
+    url: "./023_hurrying-cars/",
+    description: "ふたつの車、みっつの信号。タップして、走る。",
+    tags: ["p5.js", "Sound", "Interactive"]
+  },
+  {
+    number: 28,
+    title: "あおり運転",
+    url: "./023_tailgating/",
+    description: "一台に触れる。その先を、眺める。",
+    tags: ["Canvas", "Interactive"]
+  },
+  {
+    number: 29,
+    title: "恋は盲目",
+    url: "./024_love-is-blind/",
+    description: "恋をすると、世界が狭くなる。世界は何も変わっていないのに。",
+    tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 30,
     title: "ゾンビ清掃婦",
     url: "./024_zombie-cleaner/",
     description: "鳩小屋をクリックすると、鳩が飛び立ちます。空にはマーパンのアドバルーンが浮かんでいます。",
