@@ -194,5 +194,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./023_tailgating/",
     description: "一台に触れる。その先を、眺める。",
     tags: ["Canvas", "Interactive"]
+  },
+  {
+    number: 29,
+    title: "恋は盲目",
+    url: "./024_love-is-blind/",
+    description: "恋をすると、世界が狭くなる。世界は何も変わっていないのに。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
