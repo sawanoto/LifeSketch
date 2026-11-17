@@ -12,6 +12,15 @@ for (const work of window.LIFE_SKETCH_WORKS) {
   description.textContent = work.description;
   const tags = document.createElement("small");
   tags.textContent = work.tags.join(" · ");
+  if (work.thumbnail) {
+    const thumbnail = document.createElement("img");
+    thumbnail.src = work.thumbnail;
+    thumbnail.alt = "";
+    thumbnail.loading = "lazy";
+    thumbnail.width = 640;
+    thumbnail.height = 400;
+    card.append(thumbnail);
+  }
   card.append(number, title, description, tags);
   list.append(card);
 }
