@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f2e9">
+<title>会話の地雷原 · LifeSketch 024</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><a href="../">LIFESketch / 024</a><button id="sound" type="button" aria-pressed="true">音あり</button></header>
+<main>
+<h1>会話の地雷原</h1>
+<div id="stage" role="img" aria-label="地雷と空中の機雷に囲まれ、静止するマーパン"></div>
+<div id="keyboard" role="group" aria-label="母音の鍵盤">
+<button type="button" data-vowel="0" aria-label="あ（A）"><span>あ</span><small>A</small></button>
+<button type="button" data-vowel="1" aria-label="い（I）"><span>い</span><small>I</small></button>
+<button type="button" data-vowel="2" aria-label="う（U）"><span>う</span><small>U</small></button>
+<button type="button" data-vowel="3" aria-label="え（E）"><span>え</span><small>E</small></button>
+<button type="button" data-vowel="4" aria-label="お（O）"><span>お</span><small>O</small></button>
+</div>
+<p id="hint" role="status">鍵盤をタップ / A・I・U・E・O</p>
+</main>
+<script src="../002_jomon-room/p5.min.js"></script>
+<script src="../002_jomon-room/p5.sound.min.js"></script>
+<script src="../shared/marpan-25d.js"></script>
+<script src="sound.js"></script>
+<script src="sketch.js"></script>
+</body>
+</html>
