@@ -201,5 +201,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./024_love-is-blind/",
     description: "恋をすると、世界が狭くなる。世界は何も変わっていないのに。",
     tags: ["p5.js", "Interactive"]
+  },
+  {
+    number: 30,
+    title: "ゾンビ清掃婦",
+    url: "./024_zombie-cleaner/",
+    description: "鳩小屋をクリックすると、鳩が飛び立ちます。空にはマーパンのアドバルーンが浮かんでいます。",
+    tags: ["p5.js", "Interactive"]
   }
 ];
