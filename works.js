@@ -180,5 +180,12 @@ window.LIFE_SKETCH_WORKS = [
     url: "./020_marpan-photo/",
     description: "好きな風景に、マーパンを。写真に置いて、記念の一枚を保存する。",
     tags: ["p5.js", "Interactive", "Photo"]
+  },
+  {
+    number: 27,
+    title: "急ぐ車",
+    url: "./023_hurrying-cars/",
+    description: "ふたつの車、みっつの信号。タップして、走る。",
+    tags: ["p5.js", "Sound", "Interactive"]
   }
 ];
